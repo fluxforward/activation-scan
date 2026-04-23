@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Activation Scan — Flux Forward</title>
+  <meta name="description" content="A 2-minute diagnostic for internationals in the Netherlands. Find out which layer may be getting in the way of your progress." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,600;0,700;1,700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #E8201A;
+      --red-dark: #b8180f;
+      --red-light: #fdf0ef;
+      --text: #0a0a0a;
+      --text-muted: #555;
+      --text-hint: #999;
+      --border: rgba(0,0,0,0.12);
+      --border-strong: rgba(0,0,0,0.25);
+      --bg: #fff;
+      --bg-off: #f5f5f5;
+      --green: #117a3f;
+      --green-light: #eef8f2;
+    }
+    body { font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+    nav { padding: 1.1rem 2rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+    .nav-logo { text-decoration: none; }
+    .logo-text { font-weight: 700; font-size: 15px; letter-spacing: 0.05em; color: var(--text); text-transform: uppercase; }
+    .nav-tag { font-size: 11px; font-weight: 700; color: var(--text-hint); letter-spacing: 0.1em; text-transform: uppercase; }
+
+    .hero { padding: 4.5rem 2rem 3.5rem; text-align: center; max-width: 720px; margin: 0 auto; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); margin-bottom: 1.75rem; }
+    .hero-badge::before, .hero-badge::after { content: ''; display: block; width: 28px; height: 1px; background: var(--red); opacity: 0.4; }
+    .hero h1 { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: clamp(2.6rem, 6.5vw, 4.2rem); line-height: 1.0; text-transform: uppercase; color: var(--text); margin-bottom: 1.25rem; }
+    .hero h1 em { font-style: italic; color: var(--red); }
+    .hero p { font-size: 17px; color: var(--text-muted); line-height: 1.7; max-width: 540px; margin: 0 auto 1.5rem; }
+    .hero-context { font-size: 14px; color: var(--text-hint); line-height: 1.6; max-width: 480px; margin: 0 auto 2.5rem; }
+    .hero-meta { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-hint); }
+    .hero-meta-item { padding: 0 1.25rem; }
+    .hero-meta-item:not(:last-child) { border-right: 1px solid var(--border); }
+
+    .scan-container { max-width: 620px; margin: 0 auto 6rem; padding: 0 1.5rem; width: 100%; }
+    .scan-card { background: var(--bg); border: 1.5px solid var(--text); padding: 2.5rem; }
+
+    .progress-track { height: 3px; background: var(--bg-off); margin-bottom: 0.75rem; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--red); transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
+    .progress-text { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-hint); margin-bottom: 2rem; }
+
+    .step { display: none; animation: fadeUp 0.25s ease both; }
+    .step.active { display: block; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .step-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); margin-bottom: 1rem; }
+    .question-text { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 24px; line-height: 1.2; color: var(--text); margin-bottom: 0.6rem; text-transform: uppercase; }
+    .question-sub { font-size: 14px; color: var(--text-muted); line-height: 1.65; margin-bottom: 1.5rem; }
+
+    .helper-box { border: 1px solid var(--border); background: var(--bg-off); padding: 0.9rem 1rem; margin-bottom: 1.5rem; }
+    .helper-title { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-hint); margin-bottom: 0.35rem; }
+    .helper-text { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+    .scale-wrap { display: flex; flex-direction: column; gap: 7px; margin-bottom: 2rem; }
+    .scale-option { display: flex; align-items: center; gap: 14px; padding: 13px 16px; border: 1px solid var(--border); cursor: pointer; transition: border-color 0.12s, background 0.12s; background: var(--bg); user-select: none; }
+    .scale-option:hover { border-color: var(--text); background: var(--bg-off); }
+    .scale-option.selected { border-color: var(--red); background: var(--red-light); }
+    .radio-dot { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--border-strong); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.12s; }
+    .scale-option.selected .radio-dot { background: var(--red); border-color: var(--red); }
+    .radio-inner { width: 7px; height: 7px; border-radius: 50%; background: white; opacity: 0; transition: opacity 0.12s; }
+    .scale-option.selected .radio-inner { opacity: 1; }
+    .opt-text { font-size: 14px; font-weight: 600; color: var(--text); }
+    .opt-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    .field { margin-bottom: 1.1rem; }
+    .field label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+    .field input[type="text"], .field input[type="email"] { width: 100%; padding: 12px 14px; border: 1px solid var(--border-strong); font-size: 15px; font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--text); outline: none; transition: border-color 0.12s; }
+    .field input:focus { border-color: var(--text); }
+    .privacy { font-size: 12px; color: var(--text-hint); line-height: 1.55; margin-bottom: 1.5rem; }
+
+    .btn-primary, .btn-secondary { width: 100%; padding: 15px; border: none; font-size: 12px; font-weight: 700; font-family: 'Barlow', sans-serif; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: background 0.12s, transform 0.1s, color 0.12s; }
+    .btn-primary { background: var(--text); color: white; }
+    .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+    .btn-primary:not(:disabled):hover { background: var(--red); }
+    .btn-primary:not(:disabled):active, .btn-secondary:active, .btn-cta:active { transform: scale(0.99); }
+    .btn-secondary { background: white; color: var(--text); border: 1px solid var(--border-strong); }
+    .btn-secondary:hover { background: var(--bg-off); }
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+    /* RESULT */
+    .result-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); margin-bottom: 0.75rem; }
+    .result-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 30px; line-height: 1.1; color: var(--text); text-transform: uppercase; margin-bottom: 1rem; }
+    .result-desc { font-size: 15px; color: var(--text-muted); line-height: 1.75; margin-bottom: 1.5rem; }
+    .insight-box { border-left: 3px solid var(--red); padding: 1.25rem 1.25rem 1.25rem 1.5rem; background: var(--red-light); margin-bottom: 1rem; }
+    .insight-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red-dark); margin-bottom: 7px; }
+    .insight-text { font-size: 14px; color: #5a1410; line-height: 1.7; }
+    .next-box { border-left: 3px solid var(--green); padding: 1.25rem 1.25rem 1.25rem 1.5rem; background: var(--green-light); margin-bottom: 1.5rem; }
+    .next-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); margin-bottom: 7px; }
+    .next-text { font-size: 14px; color: #0d5a2f; line-height: 1.7; }
+
+    /* SECONDARY LAYERS */
+    .secondary-section { margin-bottom: 1.5rem; }
+    .secondary-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-hint); margin-bottom: 1rem; }
+    .secondary-layer { border: 1px solid var(--border); padding: 1rem 1.25rem; margin-bottom: 0.5rem; }
+    .secondary-layer-name { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+    .secondary-layer-text { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+    /* ALL LAYERS OVERVIEW */
+    .all-layers { margin-bottom: 1.5rem; }
+    .all-layers-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-hint); margin-bottom: 0.75rem; }
+    .layer-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .layer-row:last-child { border-bottom: none; }
+    .layer-row-name { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
+    .layer-bar-wrap { width: 120px; height: 6px; background: var(--bg-off); border: 1px solid var(--border); }
+    .layer-bar-fill { height: 100%; background: var(--red); transition: width 0.6s ease; }
+    .layer-bar-fill.low { background: #ccc; }
+    .layer-score-label { font-size: 11px; font-weight: 700; color: var(--text-hint); width: 60px; text-align: right; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .divider { height: 1px; background: var(--border); margin: 2rem 0; }
+    .save-note { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem; }
+    .btn-inline { display: block; width: 100%; padding: 14px 16px; background: white; color: var(--text); border: 1px solid var(--border-strong); font-size: 12px; font-weight: 700; font-family: 'Barlow', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; text-align: center; text-decoration: none; cursor: pointer; transition: background 0.12s; }
+    .btn-inline:hover { background: var(--bg-off); }
+    .cta-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; text-transform: uppercase; color: var(--text); margin-bottom: 0.5rem; }
+    .cta-sub { font-size: 14px; color: var(--text-muted); line-height: 1.65; margin-bottom: 1.25rem; }
+    .btn-cta { display: block; width: 100%; padding: 16px; background: var(--red); color: white; border: none; font-size: 12px; font-weight: 700; font-family: 'Barlow', sans-serif; letter-spacing: 0.12em; text-transform: uppercase; text-align: center; text-decoration: none; cursor: pointer; transition: background 0.12s, transform 0.1s; }
+    .btn-cta:hover { background: var(--red-dark); }
+    .minor-link { display: inline-block; margin-top: 0.9rem; font-size: 13px; color: var(--text-muted); text-decoration: none; }
+    .minor-link:hover { color: var(--red); }
+
+    footer { margin-top: auto; padding: 2rem; text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-hint); border-top: 1px solid var(--border); }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--red); }
+
+    @media (max-width: 600px) {
+      .scan-card { padding: 1.75rem 1.25rem; }
+      .hero { padding: 3rem 1.5rem 2rem; }
+      .hero-meta { flex-wrap: wrap; }
+      .hero-meta-item { border: none !important; padding: 0.25rem 0.75rem; }
+      .btn-row { grid-template-columns: 1fr; }
+      .layer-bar-wrap { width: 80px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="https://fluxforward.world" class="nav-logo">
+    <span class="logo-text">Flux Forward</span>
+  </a>
+  <span class="nav-tag">Activation Scan</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">Free diagnostic</div>
+  <h1>Find out what's <em>actually</em><br>getting in the way.</h1>
+  <p>Many internationals in the Netherlands are putting in real effort. But effort alone doesn't explain why things move or don't move. This scan helps you see which layer may be slowing things down.</p>
+  <p class="hero-context">Whether you're job seeking, navigating the system, or just trying to understand where you stand — this takes 2 minutes and gives you something specific to work with.</p>
+  <div class="hero-meta">
+    <span class="hero-meta-item">5 questions</span>
+    <span class="hero-meta-item">2 minutes</span>
+    <span class="hero-meta-item">Clear next step</span>
+  </div>
+</div>
+
+<div class="scan-container">
+  <div class="scan-card">
+    <div class="progress-track"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+    <div class="progress-text" id="progress-text"></div>
+
+    <!-- Step 0: Email capture -->
+    <div class="step active" id="step-0">
+      <div class="step-label">Before we start</div>
+      <div class="question-text">Where should we send your result?</div>
+      <div class="question-sub">Your result appears instantly here. We'll also save it so you can come back to it.</div>
+      <div class="helper-box">
+        <div class="helper-title">What this scan does</div>
+        <div class="helper-text">It maps your situation across 5 layers and shows you which one may be getting in the way — with a specific next step for each.</div>
+      </div>
+      <div class="field"><label>First name</label><input type="text" id="fname" placeholder="Your name" oninput="checkIntro()" /></div>
+      <div class="field"><label>Email address</label><input type="email" id="email" placeholder="you@example.com" oninput="checkIntro()" /></div>
+      <div class="field" style="flex-direction:row;align-items:flex-start;gap:10px;display:flex;">
+        <input type="checkbox" id="newsletter" style="margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:var(--red);cursor:pointer;" />
+        <label for="newsletter" style="font-size:13px;color:var(--text-muted);line-height:1.5;cursor:pointer;text-transform:none;letter-spacing:0;">Keep me updated with insights and resources for internationals in the Netherlands.</label>
+      </div>
+      <div class="privacy">No spam. No long sequences. Just your result, and a helpful next step if it resonates.</div>
+      <button class="btn-primary" id="btn-0" onclick="goNext(0)" disabled>Start the scan →</button>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="step" id="step-1">
+      <div class="step-label">Question 1 of 5</div>
+      <div class="question-text">I'm unclear about what to focus on right now.</div>
+      <div class="question-sub">For example: job vs PhD, staying in NL vs moving, short-term income vs long-term direction. Multiple paths feel equally important.</div>
+      <div class="helper-box">
+        <div class="helper-title">What this question looks at</div>
+        <div class="helper-text">Whether your energy is split across too many directions at once, making it hard to build momentum on any of them.</div>
+      </div>
+      <div class="scale-wrap" id="scale-1"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(1)">← Back</button>
+        <button class="btn-primary" id="btn-1" onclick="goNext(1)" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step" id="step-2">
+      <div class="step-label">Question 2 of 5</div>
+      <div class="question-text">I mostly rely on LinkedIn or job boards to find opportunities.</div>
+      <div class="question-sub">I'm not fully sure how the less visible parts of the market work here — referrals, networks, or how hiring actually moves in my field.</div>
+      <div class="helper-box">
+        <div class="helper-title">What this question looks at</div>
+        <div class="helper-text">Whether part of the system is still hard to read — not just your effort inside it, but the way it works underneath.</div>
+      </div>
+      <div class="scale-wrap" id="scale-2"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(2)">← Back</button>
+        <button class="btn-primary" id="btn-2" onclick="goNext(2)" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step" id="step-3">
+      <div class="step-label">Question 3 of 5</div>
+      <div class="question-text">I struggle to explain my experience clearly in this context.</div>
+      <div class="question-sub">My background feels strong, but I'm not confident that employers or my network here quickly understand what I bring or where I fit.</div>
+      <div class="helper-box">
+        <div class="helper-title">What this question looks at</div>
+        <div class="helper-text">Whether the issue is not your skills, but how you present your experience in a way that lands clearly here.</div>
+      </div>
+      <div class="scale-wrap" id="scale-3"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(3)">← Back</button>
+        <button class="btn-primary" id="btn-3" onclick="goNext(3)" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step" id="step-4">
+      <div class="step-label">Question 4 of 5</div>
+      <div class="question-text">I'm doing many things, but they don't build on each other.</div>
+      <div class="question-sub">I apply, network, explore options, attend events — but it doesn't feel like momentum is building. Things feel scattered rather than compounding.</div>
+      <div class="helper-box">
+        <div class="helper-title">What this question looks at</div>
+        <div class="helper-text">Whether the issue is not effort, but execution that's spread too wide to create traction.</div>
+      </div>
+      <div class="scale-wrap" id="scale-4"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(4)">← Back</button>
+        <button class="btn-primary" id="btn-4" onclick="goNext(4)" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step" id="step-5">
+      <div class="step-label">Question 5 of 5</div>
+      <div class="question-text">I'm running low on energy to keep going.</div>
+      <div class="question-sub">The uncertainty, pressure, and setbacks have affected my capacity to keep showing up consistently. It takes more effort than it used to.</div>
+      <div class="helper-box">
+        <div class="helper-title">What this question looks at</div>
+        <div class="helper-text">Whether what looks like lack of progress is actually a capacity problem — and whether pushing harder would help or make it worse.</div>
+      </div>
+      <div class="scale-wrap" id="scale-5"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(5)">← Back</button>
+        <button class="btn-primary" id="btn-5" onclick="goNext(5)" disabled>See my result →</button>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="step" id="step-result">
+      <div class="result-eyebrow">Your primary layer</div>
+      <div class="result-title" id="r-title"></div>
+      <div class="result-desc" id="r-desc"></div>
+      <div class="insight-box">
+        <div class="insight-label">What this means</div>
+        <div class="insight-text" id="r-insight"></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">What to focus on next</div>
+        <div class="next-text" id="r-next"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="all-layers">
+        <div class="all-layers-title">Your full picture</div>
+        <div id="all-layers-list"></div>
+      </div>
+
+      <div class="secondary-section" id="r-secondary" style="display:none">
+        <div class="secondary-title">Other layers worth noting</div>
+        <div id="r-secondary-list"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="save-note">Your result is saved in this browser. We've also received it on our end so we can follow up if useful.</div>
+      <button class="btn-inline" onclick="copyResult()" style="margin-bottom:2rem;">Copy result summary</button>
+
+      <div class="cta-title">Want help making this practical?</div>
+      <div class="cta-sub">Book a free 15-minute Activation Scan call. We'll go through your result together and give you one clear next step.</div>
+      <a class="btn-cta" href="https://calendly.com/flux-forward/activation-scan-call" target="_blank">Book your free Activation Scan →</a>
+      <a class="minor-link" href="https://blog.fluxforward.world/p/youre-not-stuck-youre-misdiagnosed" target="_blank">Prefer to read first? Start here.</a>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <p><a href="https://fluxforward.world">Flux Forward</a> — Activating and retaining talent for the Dutch economy.</p>
+</footer>
+
+<script>
+  const opts = [
+    { v:1, label:"Not at all", sub:"This doesn't apply to me" },
+    { v:2, label:"A little", sub:"It's there, but not the main issue" },
+    { v:3, label:"Somewhat", sub:"It shows up now and then" },
+    { v:4, label:"Quite a bit", sub:"This is a real challenge for me" },
+    { v:5, label:"Very much", sub:"This feels very true right now" }
+  ];
+
+  const layers = [
+    {
+      name: "Priority Confusion",
+      title: "You're spread across too many directions.",
+      desc: "You have motivation and capacity, but no clear decision structure guiding your next move. When everything feels equally important, nothing moves forward. This is not about lacking ambition.",
+      insight: "The issue is hierarchy, not effort. If everything matters at once, your energy keeps leaking across options instead of concentrating on one.",
+      next: "Pick one path, one geography, and one timeframe first. Don't solve the whole future at once. Force one real trade-off so your effort can finally land somewhere.",
+      shortDesc: "Energy spread across too many options without a clear decision structure."
+    },
+    {
+      name: "System Blindness",
+      title: "You can't fully navigate a system you can't yet see.",
+      desc: "You're working hard on the visible parts of the market — job boards, LinkedIn, applications. But a lot of real movement happens in the less visible parts: referrals, informal networks, and understanding how things actually work here.",
+      insight: "The problem is not that you're inactive. It's that the system is still partly invisible to you, so your effort is landing in the obvious places but not always in the effective ones.",
+      next: "Don't just apply more. Spend time learning how opportunities actually move in your field here. One useful conversation or referral path can matter more than ten extra applications.",
+      shortDesc: "The system is still partly invisible, so effort lands in the obvious places but not always the effective ones."
+    },
+    {
+      name: "Positioning Collapse",
+      title: "Your experience isn't landing the way you intend.",
+      desc: "Your background is real, but after migration, the way it's understood by the market has shifted. You may be using language that's too broad, too generic, or hard to read in this context.",
+      insight: "This is not a skills problem. It's a clarity problem. If people can't quickly understand what you bring, your real value stays invisible — even when you're in the room.",
+      next: "Sharpen how you explain your direction, your experience, and your impact. Start with one thing: your headline, your About, or one experience section. Make it easier to understand in under a minute.",
+      shortDesc: "Your value is real but not reading clearly in this context."
+    },
+    {
+      name: "Execution Fragmentation",
+      title: "You're active, but nothing is compounding.",
+      desc: "You are doing things. You are trying. But your effort is spread across too many directions, and without a repeatable loop, momentum can't build. Each week feels like starting over.",
+      insight: "The issue is not laziness. It's fragmentation. When your effort is scattered across multiple tracks, nothing accumulates and nothing compounds.",
+      next: "Reduce the number of moving parts. Choose one focus, one loop, and one priority for the next two weeks. Progress builds when it is concentrated, not when it is spread wide.",
+      shortDesc: "Effort is spread too wide to build traction — each week starts from zero."
+    },
+    {
+      name: "Capacity Breakdown",
+      title: "Your system is running low on fuel.",
+      desc: "After months of pressure, uncertainty, and setbacks, your ability to keep pushing has quietly dropped. At this stage, trying harder often backfires — it leads to rushed decisions and deeper fatigue.",
+      insight: "What looks like lack of discipline may actually be depleted capacity. If your system is overloaded, forcing more effort usually creates more friction, not more progress.",
+      next: "Stabilize first. Protect sleep, reduce noise, and stop treating recovery as a reward. Getting your energy back is not a distraction from progress. It is the base for it.",
+      shortDesc: "Capacity has quietly dropped — pushing harder is making things harder, not better."
+    }
+  ];
+
+  const scores = [0,0,0,0,0];
+  let currentStep = 0;
+
+  for (let i = 1; i <= 5; i++) {
+    const wrap = document.getElementById('scale-' + i);
+    opts.forEach(opt => {
+      const el = document.createElement('div');
+      el.className = 'scale-option';
+      el.innerHTML = '<div class="radio-dot"><div class="radio-inner"></div></div><div><div class="opt-text">' + opt.label + '</div><div class="opt-sub">' + opt.sub + '</div></div>';
+      el.addEventListener('click', () => {
+        wrap.querySelectorAll('.scale-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        scores[i-1] = opt.v;
+        document.getElementById('btn-' + i).disabled = false;
+        saveState();
+      });
+      wrap.appendChild(el);
+    });
+  }
+
+  function updateProgress(step) {
+    currentStep = step;
+    const pct = step >= 6 ? 100 : Math.round((step / 6) * 100);
+    document.getElementById('progress').style.width = pct + '%';
+    document.getElementById('progress-text').textContent = step >= 6 ? 'Result ready' : 'Step ' + (step + 1) + ' of 6';
+  }
+
+  function checkIntro() {
+    const name = document.getElementById('fname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    document.getElementById('btn-0').disabled = !(name.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+    saveState();
+  }
+
+  async function saveToFormspree(firstName, email, resultData, secondaryLayers) {
+    try {
+      const payload = {
+        name: firstName,
+        email: email,
+        source: 'Activation Scan V2',
+        newsletter: document.getElementById('newsletter').checked ? 'yes' : 'no',
+        scores: scores.join(','),
+      };
+      if (resultData) {
+        payload.primary_layer = resultData.name;
+        payload.primary_title = resultData.title;
+        payload.primary_next = resultData.next;
+        payload.secondary_layers = secondaryLayers ? secondaryLayers.map(l => l.name).join(', ') : '';
+        payload.score_priority_confusion = scores[0];
+        payload.score_system_blindness = scores[1];
+        payload.score_positioning = scores[2];
+        payload.score_execution = scores[3];
+        payload.score_capacity = scores[4];
+      }
+      await fetch('https://formspree.io/f/xaqabvgd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } catch(e) { console.log('Formspree error:', e); }
+  }
+
+  function saveState() {
+    try {
+      const state = { currentStep, fname: document.getElementById('fname').value, email: document.getElementById('email').value, newsletter: document.getElementById('newsletter').checked, scores, savedAt: new Date().toISOString() };
+      localStorage.setItem('ff_scan_v2_state', JSON.stringify(state));
+    } catch(e) {}
+  }
+
+  function restoreState() {
+    try {
+      const raw = localStorage.getItem('ff_scan_v2_state');
+      if (!raw) return;
+      const state = JSON.parse(raw);
+      document.getElementById('fname').value = state.fname || '';
+      document.getElementById('email').value = state.email || '';
+      document.getElementById('newsletter').checked = !!state.newsletter;
+      checkIntro();
+      if (Array.isArray(state.scores)) {
+        state.scores.forEach((v, idx) => {
+          scores[idx] = v || 0;
+          if (v > 0) {
+            const wrap = document.getElementById('scale-' + (idx + 1));
+            if (wrap) {
+              const option = wrap.querySelectorAll('.scale-option')[v - 1];
+              if (option) option.classList.add('selected');
+              const btn = document.getElementById('btn-' + (idx + 1));
+              if (btn) btn.disabled = false;
+            }
+          }
+        });
+      }
+      if (typeof state.currentStep === 'number' && state.currentStep > 0 && state.currentStep < 6) {
+        document.querySelector('.step.active').classList.remove('active');
+        document.getElementById('step-' + state.currentStep).classList.add('active');
+        updateProgress(state.currentStep);
+      }
+    } catch(e) {}
+  }
+
+  function goNext(from) {
+    const name = document.getElementById('fname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    if (from === 0) saveToFormspree(name, email, null, null);
+    document.getElementById('step-' + from).classList.remove('active');
+    if (from === 5) { showResult(); return; }
+    document.getElementById('step-' + (from + 1)).classList.add('active');
+    updateProgress(from + 1);
+    window.scrollTo(0, 0);
+    saveState();
+  }
+
+  function goBack(from) {
+    document.getElementById('step-' + from).classList.remove('active');
+    document.getElementById('step-' + (from - 1)).classList.add('active');
+    updateProgress(from - 1);
+    window.scrollTo(0, 0);
+    saveState();
+  }
+
+  function getScoreLabel(score) {
+    if (score <= 1) return 'Not present';
+    if (score <= 2) return 'A little';
+    if (score <= 3) return 'Somewhat';
+    if (score <= 4) return 'Quite a bit';
+    return 'Very much';
+  }
+
+  async function showResult() {
+    let max = -1, primaryIdx = 0;
+    scores.forEach((s, i) => { if (s > max) { max = s; primaryIdx = i; } });
+    const primary = layers[primaryIdx];
+
+    document.getElementById('r-title').textContent = primary.title;
+    document.getElementById('r-desc').textContent = primary.desc;
+    document.getElementById('r-insight').textContent = primary.insight;
+    document.getElementById('r-next').textContent = primary.next;
+
+    const allLayersList = document.getElementById('all-layers-list');
+    allLayersList.innerHTML = '';
+    layers.forEach((layer, i) => {
+      const score = scores[i];
+      const pct = Math.round((score / 5) * 100);
+      const isPrimary = i === primaryIdx;
+      const row = document.createElement('div');
+      row.className = 'layer-row';
+      row.innerHTML = '<div class="layer-row-name" style="' + (isPrimary ? 'font-weight:700;color:var(--red);' : '') + '">' + layer.name + (isPrimary ? ' ↑' : '') + '</div><div class="layer-bar-wrap"><div class="layer-bar-fill ' + (score <= 2 ? 'low' : '') + '" style="width:' + pct + '%"></div></div><div class="layer-score-label">' + getScoreLabel(score) + '</div>';
+      allLayersList.appendChild(row);
+    });
+
+    const secondaries = scores.map((s, i) => ({ s, i })).filter(x => x.i !== primaryIdx && x.s >= 3);
+    const secondaryList = document.getElementById('r-secondary-list');
+    secondaryList.innerHTML = '';
+    if (secondaries.length > 0) {
+      secondaries.sort((a, b) => b.s - a.s);
+      secondaries.forEach(x => {
+        const l = layers[x.i];
+        const item = document.createElement('div');
+        item.className = 'secondary-layer';
+        item.innerHTML = '<div class="secondary-layer-name">' + l.name + '</div><div class="secondary-layer-text">' + l.shortDesc + '</div>';
+        secondaryList.appendChild(item);
+      });
+      document.getElementById('r-secondary').style.display = 'block';
+    } else {
+      document.getElementById('r-secondary').style.display = 'none';
+    }
+
+    document.getElementById('step-result').classList.add('active');
+    updateProgress(6);
+    window.scrollTo(0, 0);
+
+    const secondaryLayers = secondaries.map(x => layers[x.i]);
+    const name = document.getElementById('fname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    await saveToFormspree(name, email, primary, secondaryLayers);
+
+    const summary = buildSummary(primary, secondaries);
+    try {
+      localStorage.setItem('ff_scan_v2_result', JSON.stringify({ summary, primaryLayer: primary.name, scores, savedAt: new Date().toISOString() }));
+    } catch(e) {}
+    saveState();
+  }
+
+  function buildSummary(primary, secondaries) {
+    let s = 'Primary layer: ' + primary.name + '\n\n' + primary.title + '\n\n' + primary.desc + '\n\nWhat this means: ' + primary.insight + '\n\nWhat to focus on next: ' + primary.next;
+    if (secondaries.length > 0) {
+      s += '\n\nOther layers worth noting: ' + secondaries.map(x => layers[x.i].name).join(', ');
+    }
+    return s;
+  }
+
+  async function copyResult() {
+    try {
+      const raw = localStorage.getItem('ff_scan_v2_result');
+      if (!raw) return;
+      const payload = JSON.parse(raw);
+      await navigator.clipboard.writeText(payload.summary);
+      alert('Result copied to clipboard.');
+    } catch(e) {
+      alert('Could not copy automatically. Please select the text manually.');
+    }
+  }
+
+  restoreState();
+  updateProgress(currentStep);
+</script>
+</body>
+</html>
