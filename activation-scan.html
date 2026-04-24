@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Activation Scan — Flux Forward</title>
+  <meta name="description" content="A 2-minute diagnostic for internationals in the Netherlands. Find out which layer may be getting in the way of your progress." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,600;0,700;1,700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #E8201A; --red-dark: #b8180f; --red-light: #fdf0ef;
+      --text: #0a0a0a; --text-muted: #555; --text-hint: #999;
+      --border: rgba(0,0,0,0.12); --border-strong: rgba(0,0,0,0.25);
+      --bg: #fff; --bg-off: #f5f5f5;
+      --green: #117a3f; --green-light: #eef8f2;
+    }
+    body { font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    nav { padding: 1.1rem 2rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+    .nav-logo { text-decoration: none; }
+    .logo-text { font-weight: 700; font-size: 15px; letter-spacing: 0.05em; color: var(--text); text-transform: uppercase; }
+    .nav-tag { font-size: 11px; font-weight: 700; color: var(--text-hint); letter-spacing: 0.1em; text-transform: uppercase; }
+    .hero { padding: 4.5rem 2rem 3.5rem; text-align: center; max-width: 720px; margin: 0 auto; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); margin-bottom: 1.75rem; }
+    .hero-badge::before, .hero-badge::after { content: ''; display: block; width: 28px; height: 1px; background: var(--red); opacity: 0.4; }
+    .hero h1 { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: clamp(2.6rem, 6.5vw, 4.2rem); line-height: 1.0; text-transform: uppercase; color: var(--text); margin-bottom: 1.25rem; }
+    .hero h1 em { font-style: italic; color: var(--red); }
+    .hero p { font-size: 17px; color: var(--text-muted); line-height: 1.7; max-width: 540px; margin: 0 auto 2.5rem; }
+    .hero-meta { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-hint); }
+    .hero-meta-item { padding: 0 1.25rem; }
+    .hero-meta-item:not(:last-child) { border-right: 1px solid var(--border); }
+    .scan-container { max-width: 620px; margin: 0 auto 6rem; padding: 0 1.5rem; width: 100%; }
+    .scan-card { background: var(--bg); border: 1.5px solid var(--text); padding: 2.5rem; }
+    .progress-track { height: 3px; background: var(--bg-off); margin-bottom: 0.75rem; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--red); transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
+    .progress-text { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-hint); margin-bottom: 2rem; }
+    .step { display: none; animation: fadeUp 0.25s ease both; }
+    .step.active { display: block; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .step-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); margin-bottom: 1rem; }
+    .question-text { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; line-height: 1.25; color: var(--text); margin-bottom: 0.6rem; text-transform: uppercase; }
+    .question-context { font-size: 13px; color: var(--text-hint); font-style: italic; line-height: 1.6; margin-bottom: 1.5rem; border-left: 2px solid var(--border); padding-left: 0.75rem; }
+    .choice-wrap { display: flex; flex-direction: column; gap: 8px; margin-bottom: 2rem; }
+    .choice-option { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; border: 1px solid var(--border); cursor: pointer; transition: border-color 0.12s, background 0.12s; background: var(--bg); user-select: none; }
+    .choice-option:hover { border-color: var(--text); background: var(--bg-off); }
+    .choice-option.selected { border-color: var(--red); background: var(--red-light); }
+    .choice-dot { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--border-strong); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.12s; margin-top: 1px; }
+    .choice-option.selected .choice-dot { background: var(--red); border-color: var(--red); }
+    .choice-inner { width: 7px; height: 7px; border-radius: 50%; background: white; opacity: 0; transition: opacity 0.12s; }
+    .choice-option.selected .choice-inner { opacity: 1; }
+    .choice-text { font-size: 14px; color: var(--text); line-height: 1.5; }
+    .preview-intro { font-size: 16px; color: var(--text-muted); line-height: 1.75; margin-bottom: 2rem; }
+    .preview-what { margin-bottom: 2rem; }
+    .preview-what-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-hint); margin-bottom: 1rem; }
+    .layer-preview-item { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+    .layer-preview-item:last-child { border-bottom: none; }
+    .layer-preview-num { font-size: 11px; font-weight: 700; color: var(--red); width: 18px; flex-shrink: 0; padding-top: 2px; }
+    .layer-preview-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .layer-preview-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+    .preview-output { border-left: 3px solid var(--text); padding: 1rem 1rem 1rem 1.25rem; background: var(--bg-off); margin-bottom: 2rem; }
+    .preview-output-title { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-hint); margin-bottom: 0.5rem; }
+    .preview-output-list { font-size: 14px; color: var(--text-muted); line-height: 1.8; padding-left: 1rem; }
+    .preview-read-more { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem; }
+    .preview-read-more a { color: var(--red); text-decoration: none; }
+    .preview-read-more a:hover { text-decoration: underline; }
+    .field { margin-bottom: 1.1rem; }
+    .field label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+    .field input[type="text"], .field input[type="email"] { width: 100%; padding: 12px 14px; border: 1px solid var(--border-strong); font-size: 15px; font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--text); outline: none; transition: border-color 0.12s; }
+    .field input:focus { border-color: var(--text); }
+    .gdpr-note { font-size: 12px; color: var(--text-hint); line-height: 1.6; margin-bottom: 1.5rem; }
+    .gdpr-note a { color: var(--text-hint); text-decoration: underline; }
+    .btn-primary, .btn-secondary { width: 100%; padding: 15px; border: none; font-size: 12px; font-weight: 700; font-family: 'Barlow', sans-serif; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: background 0.12s, transform 0.1s, color 0.12s; }
+    .btn-primary { background: var(--text); color: white; }
+    .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+    .btn-primary:not(:disabled):hover { background: var(--red); }
+    .btn-primary:not(:disabled):active, .btn-secondary:active, .btn-cta:active { transform: scale(0.99); }
+    .btn-secondary { background: white; color: var(--text); border: 1px solid var(--border-strong); }
+    .btn-secondary:hover { background: var(--bg-off); }
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .email-capture { border: 1.5px solid var(--text); padding: 1.5rem; margin-bottom: 1.5rem; background: var(--bg-off); }
+    .email-capture-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; text-transform: uppercase; color: var(--text); margin-bottom: 0.4rem; }
+    .email-capture-sub { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.25rem; }
+    .email-capture-success { font-size: 14px; color: var(--green); font-weight: 600; padding: 0.75rem 0; display: none; }
+    .result-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); margin-bottom: 0.75rem; }
+    .result-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 30px; line-height: 1.1; color: var(--text); text-transform: uppercase; margin-bottom: 1rem; }
+    .result-desc { font-size: 15px; color: var(--text-muted); line-height: 1.75; margin-bottom: 1.5rem; }
+    .insight-box { border-left: 3px solid var(--red); padding: 1.25rem 1.25rem 1.25rem 1.5rem; background: var(--red-light); margin-bottom: 1rem; }
+    .insight-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red-dark); margin-bottom: 7px; }
+    .insight-text { font-size: 14px; color: #5a1410; line-height: 1.7; }
+    .next-box { border-left: 3px solid var(--green); padding: 1.25rem 1.25rem 1.25rem 1.5rem; background: var(--green-light); margin-bottom: 1.5rem; }
+    .next-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); margin-bottom: 7px; }
+    .next-text { font-size: 14px; color: #0d5a2f; line-height: 1.7; }
+    .all-layers { margin-bottom: 1.5rem; }
+    .all-layers-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-hint); margin-bottom: 0.75rem; }
+    .layer-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .layer-row:last-child { border-bottom: none; }
+    .layer-row-name { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
+    .layer-bar-wrap { width: 120px; height: 6px; background: var(--bg-off); border: 1px solid var(--border); }
+    .layer-bar-fill { height: 100%; background: var(--red); transition: width 0.6s ease; }
+    .layer-bar-fill.low { background: #ccc; }
+    .layer-score-label { font-size: 11px; font-weight: 700; color: var(--text-hint); width: 60px; text-align: right; text-transform: uppercase; letter-spacing: 0.05em; }
+    .secondary-section { margin-bottom: 1.5rem; }
+    .secondary-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-hint); margin-bottom: 1rem; }
+    .secondary-layer { border: 1px solid var(--border); padding: 1rem 1.25rem; margin-bottom: 0.5rem; }
+    .secondary-layer-name { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+    .secondary-layer-text { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .accuracy-box { border: 1px solid var(--border); padding: 1.25rem; margin-bottom: 1.5rem; background: var(--bg-off); }
+    .accuracy-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; }
+    .accuracy-sub { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 0.75rem; }
+    .accuracy-link { font-size: 13px; color: var(--red); text-decoration: none; font-weight: 600; }
+    .accuracy-link:hover { text-decoration: underline; }
+    .divider { height: 1px; background: var(--border); margin: 2rem 0; }
+    .btn-inline { display: block; width: 100%; padding: 14px 16px; background: white; color: var(--text); border: 1px solid var(--border-strong); font-size: 12px; font-weight: 700; font-family: 'Barlow', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; text-align: center; text-decoration: none; cursor: pointer; transition: background 0.12s; margin-bottom: 2rem; }
+    .btn-inline:hover { background: var(--bg-off); }
+    .cta-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; text-transform: uppercase; color: var(--text); margin-bottom: 0.5rem; }
+    .cta-sub { font-size: 14px; color: var(--text-muted); line-height: 1.65; margin-bottom: 1.25rem; }
+    .btn-cta { display: block; width: 100%; padding: 16px; background: var(--red); color: white; border: none; font-size: 12px; font-weight: 700; font-family: 'Barlow', sans-serif; letter-spacing: 0.12em; text-transform: uppercase; text-align: center; text-decoration: none; cursor: pointer; transition: background 0.12s, transform 0.1s; }
+    .btn-cta:hover { background: var(--red-dark); }
+    .minor-links { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .minor-link { font-size: 13px; color: var(--text-muted); text-decoration: none; }
+    .minor-link:hover { color: var(--red); }
+    footer { margin-top: auto; padding: 2rem; text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-hint); border-top: 1px solid var(--border); }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--red); }
+    @media (max-width: 600px) {
+      .scan-card { padding: 1.75rem 1.25rem; }
+      .hero { padding: 3rem 1.5rem 2rem; }
+      .hero-meta { flex-wrap: wrap; }
+      .hero-meta-item { border: none !important; padding: 0.25rem 0.75rem; }
+      .btn-row { grid-template-columns: 1fr; }
+      .layer-bar-wrap { width: 80px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="https://fluxforward.world" class="nav-logo"><span class="logo-text">Flux Forward</span></a>
+  <span class="nav-tag">Activation Scan</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">Free diagnostic</div>
+  <h1>Find out what's <em>actually</em><br>getting in the way.</h1>
+  <p>Whether things are moving well or not quite yet, this scan helps you see where to focus. It maps your situation across 5 layers — and gives you something specific to work with.</p>
+  <div class="hero-meta">
+    <span class="hero-meta-item">5 questions</span>
+    <span class="hero-meta-item">2 minutes</span>
+    <span class="hero-meta-item">No signup needed</span>
+  </div>
+</div>
+
+<div class="scan-container">
+  <div class="scan-card">
+    <div class="progress-track"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+    <div class="progress-text" id="progress-text"></div>
+
+    <!-- STEP 0: PREVIEW -->
+    <div class="step active" id="step-0">
+      <div class="step-label">Before you start</div>
+      <div class="question-text">What is this scan?</div>
+      <p class="preview-intro">Flux Forward works with internationals navigating the Dutch market. Over time, after hundreds of conversations, we identified 5 specific layers where progress tends to slow down. Most people are dealing with 1 or 2 of them — but rarely know which ones. This scan helps you find out.</p>
+      <div class="helper-box" style="margin-bottom:1.5rem;">
+        <div class="helper-title">Who this is for</div>
+        <div class="helper-text" style="margin-bottom:0.5rem;">Internationals in the Netherlands in an active transition phase — job seeking, navigating a career change, or trying to find your footing here. The transition looks different for everyone. Some experience it in year one, others in year five or beyond.</div>
+        <div class="helper-title" style="margin-top:0.75rem;">Who this is not for</div>
+        <div class="helper-text">People who are settled, not in active transition, or not navigating the Dutch market. The questions are designed for a specific context — if that’s not where you are, the results may not be meaningful.</div>
+      </div>
+      <div class="preview-what">
+        <div class="preview-what-title">The 5 layers</div>
+        <div class="layer-preview-item"><div class="layer-preview-num">1</div><div><div class="layer-preview-name">Priority Confusion</div><div class="layer-preview-desc">Too many directions at once, no clear decision structure.</div></div></div>
+        <div class="layer-preview-item"><div class="layer-preview-num">2</div><div><div class="layer-preview-name">System Blindness</div><div class="layer-preview-desc">The system is still partly invisible — effort lands in the obvious places but not always the effective ones.</div></div></div>
+        <div class="layer-preview-item"><div class="layer-preview-num">3</div><div><div class="layer-preview-name">Positioning Collapse</div><div class="layer-preview-desc">Your experience is real, but it's not landing clearly in this context.</div></div></div>
+        <div class="layer-preview-item"><div class="layer-preview-num">4</div><div><div class="layer-preview-name">Execution Fragmentation</div><div class="layer-preview-desc">Effort is spread too wide to build traction. Each week starts from zero.</div></div></div>
+        <div class="layer-preview-item"><div class="layer-preview-num">5</div><div><div class="layer-preview-name">Capacity Breakdown</div><div class="layer-preview-desc">Capacity has quietly dropped — pushing harder is making things harder, not better.</div></div></div>
+      </div>
+      <div class="preview-output">
+        <div class="preview-output-title">What you'll get</div>
+        <ul class="preview-output-list">
+          <li>Your primary layer with a full explanation</li>
+          <li>A visual picture of all 5 layers</li>
+          <li>One specific next step</li>
+          <li>Option to save your result by email</li>
+        </ul>
+      </div>
+      <div class="preview-read-more">Want to understand the framework first? Read: <a href="https://blog.fluxforward.world/p/youre-not-stuck-youre-misdiagnosed" target="_blank">You're not stuck. You're misdiagnosed.</a> or <a href="https://blog.fluxforward.world/p/how-activation-actually-happens" target="_blank">How activation actually happens.</a></div>
+      <button class="btn-primary" onclick="goNext(0)">Start the scan — no signup needed →</button>
+    </div>
+
+    <!-- STEP 1: Priority Confusion -->
+    <div class="step" id="step-1">
+      <div class="step-label">Question 1 of 5</div>
+      <div class="question-text">In the past two weeks, how many different directions have you actively been pursuing at the same time?</div>
+      <div class="question-context">Many people arrive in the Netherlands with a clear goal — then find the context shifts what's possible or desirable. This question looks at whether that's created a decision gap.</div>
+      <div class="choice-wrap" id="choices-1"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(1)">← Back</button>
+        <button class="btn-primary" id="btn-1" onclick="goNext(1)" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: System Blindness -->
+    <div class="step" id="step-2">
+      <div class="step-label">Question 2 of 5</div>
+      <div class="question-text">When you think about your last 5 opportunities or conversations — how did most of them come about?</div>
+      <div class="question-context">The Dutch job market has a visible layer and an invisible one. Most people start with what they can see. This question checks whether the invisible part is still unclear.</div>
+      <div class="choice-wrap" id="choices-2"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(2)">← Back</button>
+        <button class="btn-primary" id="btn-2" onclick="goNext(2)" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Positioning Collapse -->
+    <div class="step" id="step-3">
+      <div class="step-label">Question 3 of 5</div>
+      <div class="question-text">When someone asks what you do or what you're looking for here — what usually happens?</div>
+      <div class="question-context">Moving countries often creates a translation gap — not in language, but in how your value is read. Strong experience doesn't automatically land the same way in a new context.</div>
+      <div class="choice-wrap" id="choices-3"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(3)">← Back</button>
+        <button class="btn-primary" id="btn-3" onclick="goNext(3)" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Execution Fragmentation -->
+    <div class="step" id="step-4">
+      <div class="step-label">Question 4 of 5</div>
+      <div class="question-text">Looking at last week — which of these best describes how you spent your energy?</div>
+      <div class="question-context">Activity and progress are not the same thing. This question looks at whether your effort is concentrated enough to create a loop — or spread too wide to compound.</div>
+      <div class="choice-wrap" id="choices-4"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(4)">← Back</button>
+        <button class="btn-primary" id="btn-4" onclick="goNext(4)" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Capacity Breakdown -->
+    <div class="step" id="step-5">
+      <div class="step-label">Question 5 of 5</div>
+      <div class="question-text">When you think about the next step you know you should take — what gets in the way most often?</div>
+      <div class="question-context">Long transitions quietly deplete capacity. This isn't a character issue — it's a system issue. When capacity drops, more pressure usually creates more friction, not more progress.</div>
+      <div class="choice-wrap" id="choices-5"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(5)">← Back</button>
+        <button class="btn-primary" id="btn-5" onclick="goNext(5)" disabled>See my result →</button>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="step" id="step-result">
+      <div class="result-eyebrow" id="r-eyebrow">Your primary layer</div>
+      <div class="result-title" id="r-title"></div>
+      <div class="result-desc" id="r-desc"></div>
+      <div class="insight-box">
+        <div class="insight-label">What this means</div>
+        <div class="insight-text" id="r-insight"></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">What to focus on next</div>
+        <div class="next-text" id="r-next"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="all-layers" id="r-all-layers">
+        <div class="all-layers-title">Your full picture</div>
+        <div id="all-layers-list"></div>
+      </div>
+      <div class="secondary-section" id="r-secondary" style="display:none">
+        <div class="secondary-title">Other layers worth noting</div>
+        <div id="r-secondary-list"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="accuracy-box">
+        <div class="accuracy-title">Does this feel accurate to you?</div>
+        <div class="accuracy-sub">Results are based on 5 questions — they're a starting point, not a full picture. If something doesn't land, we'd like to know. You can reply directly or book a call to go deeper.</div>
+        <a class="accuracy-link" href="mailto:hi@fluxforward.world?subject=Activation Scan feedback">Share your thoughts →</a>
+      </div>
+      <div class="email-capture" id="email-capture-block">
+        <div class="email-capture-title">Save your result</div>
+        <div class="email-capture-sub">Enter your email and we'll keep a copy so you can follow up later.</div>
+        <div class="field"><label>First name</label><input type="text" id="fname" placeholder="Your name" oninput="checkEmail()" /></div>
+        <div class="field"><label>Email address</label><input type="email" id="email" placeholder="you@example.com" oninput="checkEmail()" /></div>
+        <div class="field" style="flex-direction:row;align-items:flex-start;gap:10px;display:flex;">
+          <input type="checkbox" id="newsletter" style="margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:var(--red);cursor:pointer;" />
+          <label for="newsletter" style="font-size:13px;color:var(--text-muted);line-height:1.5;cursor:pointer;text-transform:none;letter-spacing:0;">Keep me updated with insights and resources for internationals in the Netherlands.</label>
+        </div>
+        <div class="gdpr-note">Your data is stored securely via Formspree and used only to send your result and, if you opt in, occasional updates from Flux Forward. We never share it with third parties. You can request deletion at any time by emailing <a href="mailto:hi@fluxforward.world">hi@fluxforward.world</a>.</div>
+        <button class="btn-primary" id="btn-save" onclick="saveResult()" disabled style="margin-bottom:0.75rem;">Save my result →</button>
+        <div class="email-capture-success" id="save-success">Saved. We'll be in touch if useful.</div>
+        <button class="btn-secondary" onclick="skipSave()" style="font-size:11px;padding:10px;margin-top:0.5rem;">No thanks, skip this</button>
+      </div>
+      <div id="post-save-block" style="display:none;">
+        <button class="btn-inline" onclick="copyResult()">Copy result summary</button>
+      </div>
+      <div class="cta-title" id="cta-title">Want help making this practical?</div>
+      <div class="cta-sub" id="cta-sub">Book a free 15-minute Activation Scan call. We’ll go through your result together and give you one clear next step.</div>
+      <a class="btn-cta" id="cta-btn" href="https://calendly.com/flux-forward/activation-scan-call" target="_blank">Book your free Activation Scan →</a>
+      <div class="minor-links">
+        <a class="minor-link" href="https://blog.fluxforward.world/p/youre-not-stuck-youre-misdiagnosed" target="_blank">Read: You're not stuck. You're misdiagnosed. →</a>
+        <a class="minor-link" href="https://blog.fluxforward.world/p/how-activation-actually-happens" target="_blank">Read: How activation actually happens. →</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <p><a href="https://fluxforward.world">Flux Forward</a> — Activating and retaining talent for the Dutch economy.</p>
+</footer>
+
+<script>
+  // Each question: array of {text, layer_index, score}
+  // layer_index: 0=Priority, 1=System, 2=Positioning, 3=Execution, 4=Capacity
+  const questions = [
+    {
+      choices: [
+        { text: "Just one, clearly defined", layer: 0, score: 1 },
+        { text: "Two or three, with some overlap", layer: 0, score: 2 },
+        { text: "Four or more, hard to keep track", layer: 0, score: 4 },
+        { text: "I'm not sure — it changes week to week", layer: 0, score: 5 }
+      ]
+    },
+    {
+      choices: [
+        { text: "Mostly through platforms I searched (LinkedIn, job boards)", layer: 1, score: 5 },
+        { text: "A mix of platforms and people I already knew", layer: 1, score: 3 },
+        { text: "Mostly through people who reached out or referred me", layer: 1, score: 1 },
+        { text: "I haven't had many opportunities or conversations recently", layer: 1, score: 4 }
+      ]
+    },
+    {
+      choices: [
+        { text: "I explain it clearly and they get it quickly", layer: 2, score: 1 },
+        { text: "I explain it but often get vague or uncertain reactions", layer: 2, score: 3 },
+        { text: "I struggle to find the right framing for this context", layer: 2, score: 5 },
+        { text: "I tend to give different answers depending on who's asking", layer: 2, score: 4 }
+      ]
+    },
+    {
+      choices: [
+        { text: "Focused on one clear track with consistent actions", layer: 3, score: 1 },
+        { text: "Split across 2–3 things, some progress on each", layer: 3, score: 2 },
+        { text: "Spread across many things, hard to point to clear progress", layer: 3, score: 5 },
+        { text: "Mostly reactive — responding to things as they came up", layer: 3, score: 4 }
+      ]
+    },
+    {
+      choices: [
+        { text: "Nothing much — I usually follow through", layer: 4, score: 1 },
+        { text: "Uncertainty about whether it's the right step", layer: 0, score: 3 },
+        { text: "Low energy or motivation to start", layer: 4, score: 5 },
+        { text: "Too many competing priorities pulling me elsewhere", layer: 3, score: 4 }
+      ]
+    }
+  ];
+
+  const layers = [
+    { name:"Priority Confusion", title:"You're spread across too many directions.", desc:"You have motivation and capacity, but no clear decision structure guiding your next move. When everything feels equally important, nothing moves forward. This is not about lacking ambition.", insight:"The issue is hierarchy, not effort. If everything matters at once, your energy keeps leaking across options instead of concentrating on one.", next:"Pick one path, one geography, and one timeframe first. Don't solve the whole future at once. Force one real trade-off so your effort can finally land somewhere.", shortDesc:"Energy spread across too many options without a clear decision structure." },
+    { name:"System Blindness", title:"You can't fully navigate a system you can't yet see.", desc:"You're working hard on the visible parts of the market — job boards, LinkedIn, applications. But a lot of real movement happens in the less visible parts: referrals, informal networks, and understanding how things actually work here.", insight:"The problem is not that you're inactive. It's that the system is still partly invisible to you, so your effort is landing in the obvious places but not always in the effective ones.", next:"Don't just apply more. Spend time learning how opportunities actually move in your field here. One useful conversation or referral path can matter more than ten extra applications.", shortDesc:"The system is still partly invisible, so effort lands in the obvious places but not always the effective ones." },
+    { name:"Positioning Collapse", title:"Your experience isn't landing the way you intend.", desc:"Your background is real, but after migration, the way it's understood by the market has shifted. You may be using language that's too broad, too generic, or hard to read in this context.", insight:"This is not a skills problem. It's a clarity problem. If people can't quickly understand what you bring, your real value stays invisible — even when you're in the room.", next:"Sharpen how you explain your direction, your experience, and your impact. Start with one thing: your headline, your About, or one experience section. Make it easier to understand in under a minute.", shortDesc:"Your value is real but not reading clearly in this context." },
+    { name:"Execution Fragmentation", title:"You're active, but nothing is compounding.", desc:"You are doing things. You are trying. But your effort is spread across too many directions, and without a repeatable loop, momentum can't build. Each week feels like starting over.", insight:"The issue is not laziness. It's fragmentation. When your effort is scattered across multiple tracks, nothing accumulates and nothing compounds.", next:"Reduce the number of moving parts. Choose one focus, one loop, and one priority for the next two weeks. Progress builds when it is concentrated, not when it is spread wide.", shortDesc:"Effort is spread too wide to build traction — each week starts from zero." },
+    { name:"Capacity Breakdown", title:"Your system is running low on fuel.", desc:"After months of pressure, uncertainty, and setbacks, your ability to keep pushing has quietly dropped. At this stage, trying harder often backfires — it leads to rushed decisions and deeper fatigue.", insight:"What looks like lack of discipline may actually be depleted capacity. If your system is overloaded, forcing more effort usually creates more friction, not more progress.", next:"Stabilize first. Protect sleep, reduce noise, and stop treating recovery as a reward. Getting your energy back is not a distraction from progress. It is the base for it.", shortDesc:"Capacity has quietly dropped — pushing harder is making things harder, not better." }
+  ];
+
+  // scores per layer
+  const layerScores = [0, 0, 0, 0, 0];
+  const selectedChoices = [null, null, null, null, null];
+  let currentStep = 0;
+  let resultData = null;
+  let secondaryLayers = [];
+
+  // Build choice UIs
+  for (let q = 1; q <= 5; q++) {
+    const wrap = document.getElementById('choices-' + q);
+    questions[q-1].choices.forEach((choice, ci) => {
+      const el = document.createElement('div');
+      el.className = 'choice-option';
+      el.innerHTML = '<div class="choice-dot"><div class="choice-inner"></div></div><div class="choice-text">' + choice.text + '</div>';
+      el.addEventListener('click', () => {
+        wrap.querySelectorAll('.choice-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedChoices[q-1] = ci;
+        document.getElementById('btn-' + q).disabled = false;
+      });
+      wrap.appendChild(el);
+    });
+  }
+
+  function computeScores() {
+    layerScores.fill(0);
+    for (let q = 0; q < 5; q++) {
+      const ci = selectedChoices[q];
+      if (ci === null) continue;
+      const choice = questions[q].choices[ci];
+      layerScores[choice.layer] += choice.score;
+    }
+  }
+
+  function updateProgress(step) {
+    currentStep = step;
+    const pct = step >= 6 ? 100 : Math.round((step / 6) * 100);
+    document.getElementById('progress').style.width = pct + '%';
+    const labels = ['', 'Question 1 of 5', 'Question 2 of 5', 'Question 3 of 5', 'Question 4 of 5', 'Question 5 of 5', 'Result ready'];
+    document.getElementById('progress-text').textContent = labels[step] || '';
+  }
+
+  function checkEmail() {
+    const name = document.getElementById('fname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    document.getElementById('btn-save').disabled = !(name.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+  }
+
+  function goNext(from) {
+    document.getElementById('step-' + from).classList.remove('active');
+    if (from === 5) { showResult(); return; }
+    document.getElementById('step-' + (from + 1)).classList.add('active');
+    updateProgress(from + 1);
+    window.scrollTo(0, 0);
+  }
+
+  function goBack(from) {
+    document.getElementById('step-' + from).classList.remove('active');
+    document.getElementById('step-' + (from - 1)).classList.add('active');
+    updateProgress(from - 1);
+    window.scrollTo(0, 0);
+  }
+
+  function getScoreLabel(score) {
+    if (score === 0) return 'Not present';
+    if (score <= 2) return 'Low';
+    if (score <= 4) return 'Moderate';
+    if (score <= 6) return 'High';
+    return 'Very high';
+  }
+
+  function isLowResult(maxScore) {
+    return maxScore <= 2;
+  }
+
+  function showResult() {
+    computeScores();
+    const maxScore = Math.max(...layerScores);
+    let primaryIdx = layerScores.indexOf(maxScore);
+    resultData = { idx: primaryIdx, ...layers[primaryIdx] };
+
+    if (isLowResult(maxScore)) {
+      document.getElementById('r-eyebrow').textContent = 'Your result';
+      document.getElementById('r-title').textContent = 'Things seem to be in a relatively clear place right now.';
+      document.getElementById('r-desc').textContent = "Based on your answers, none of the 5 layers we track appear to be significantly blocking your progress right now. That's a good sign.";
+      document.getElementById('r-insight').textContent = "This could mean things are genuinely flowing well for you — or that the friction in your situation isn't captured by these 5 layers yet. Either way, it's worth a quick conversation to see what's actually happening.";
+      document.getElementById('r-next').textContent = "If you're in a good place, the next step is keeping it that way. If something does feel off but didn't show up here, a short conversation often reveals it quickly. Either way, we're happy to take a look together.";
+      document.getElementById('r-all-layers').style.display = 'none';
+      document.getElementById('r-secondary').style.display = 'none';
+    } else {
+      document.getElementById('r-title').textContent = resultData.title;
+      document.getElementById('r-desc').textContent = resultData.desc;
+      document.getElementById('r-insight').textContent = resultData.insight;
+      document.getElementById('r-next').textContent = resultData.next;
+
+      const allLayersList = document.getElementById('all-layers-list');
+      allLayersList.innerHTML = '';
+      const maxPossible = 10;
+      layers.forEach((layer, i) => {
+        const score = layerScores[i];
+        const pct = Math.round((score / maxPossible) * 100);
+        const isPrimary = i === primaryIdx;
+        const row = document.createElement('div');
+        row.className = 'layer-row';
+        row.innerHTML = '<div class="layer-row-name" style="' + (isPrimary ? 'font-weight:700;color:var(--red);' : '') + '">' + layer.name + (isPrimary ? ' ↑' : '') + '</div><div class="layer-bar-wrap"><div class="layer-bar-fill ' + (score <= 2 ? 'low' : '') + '" style="width:' + Math.min(pct, 100) + '%"></div></div><div class="layer-score-label">' + getScoreLabel(score) + '</div>';
+        allLayersList.appendChild(row);
+      });
+
+      const secondaries = layerScores.map((s, i) => ({ s, i })).filter(x => x.i !== primaryIdx && x.s >= 3);
+      secondaryLayers = secondaries.map(x => layers[x.i]);
+      const secondaryList = document.getElementById('r-secondary-list');
+      secondaryList.innerHTML = '';
+      if (secondaries.length > 0) {
+        secondaries.sort((a, b) => b.s - a.s);
+        secondaries.forEach(x => {
+          const l = layers[x.i];
+          const item = document.createElement('div');
+          item.className = 'secondary-layer';
+          item.innerHTML = '<div class="secondary-layer-name">' + l.name + '</div><div class="secondary-layer-text">' + l.shortDesc + '</div>';
+          secondaryList.appendChild(item);
+        });
+        document.getElementById('r-secondary').style.display = 'block';
+      }
+    }
+
+    document.getElementById('step-result').classList.add('active');
+    updateProgress(6);
+    window.scrollTo(0, 0);
+
+    // Layer-specific CTA
+    const ctaMessages = {
+      'Priority Confusion': { title: 'Not sure which path to take?', sub: "In a free 15-minute call, we'll help you cut through the options and identify one clear direction to commit to." },
+      'System Blindness': { title: 'The system is still partly invisible?', sub: "In a free 15-minute call, we'll show you what's actually moving in your field here — and where to put your effort." },
+      'Positioning Collapse': { title: 'Your value isn’t landing clearly?', sub: "In a free 15-minute call, we'll help you sharpen how you present yourself so the right people understand what you bring." },
+      'Execution Fragmentation': { title: 'Too many things, not enough traction?', sub: "In a free 15-minute call, we'll help you pick one loop and commit to it — so effort starts compounding." },
+      'Capacity Breakdown': { title: 'Running low on fuel to keep going?', sub: "In a free 15-minute call, we'll help you identify what’s draining you and what one thing would actually help right now." },
+      'low_score': { title: 'Want a second opinion?', sub: "If things are going well, great. If something still feels off, a short conversation often reveals what’s actually happening." }
+    };
+    const layerName = resultData ? resultData.name : 'low_score';
+    const ctaMsg = ctaMessages[layerName] || ctaMessages['low_score'];
+    if (document.getElementById('cta-title')) document.getElementById('cta-title').textContent = ctaMsg.title;
+    if (document.getElementById('cta-sub')) document.getElementById('cta-sub').textContent = ctaMsg.sub;
+
+    try {
+      localStorage.setItem('ff_scan_v23_result'
+, JSON.stringify({ primaryLayer: resultData ? resultData.name : 'low_score', layerScores, savedAt: new Date().toISOString() }));
+    } catch(e) {}
+  }
+
+  async function saveResult() {
+    const name = document.getElementById('fname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    if (!name || !email) return;
+    try {
+      await fetch('https://formspree.io/f/xaqabvgd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          name, email,
+          source: 'Activation Scan V2.3',
+          newsletter: document.getElementById('newsletter').checked ? 'yes' : 'no',
+          primary_layer: resultData ? resultData.name : 'low_score',
+          primary_title: resultData ? resultData.title : '',
+          primary_next: resultData ? resultData.next : '',
+          secondary_layers: secondaryLayers.map(l => l.name).join(', '),
+          score_priority_confusion: layerScores[0],
+          score_system_blindness: layerScores[1],
+          score_positioning: layerScores[2],
+          score_execution: layerScores[3],
+          score_capacity: layerScores[4]
+        })
+      });
+    } catch(e) { console.log('Formspree error:', e); }
+    document.getElementById('save-success').style.display = 'block';
+    document.getElementById('btn-save').disabled = true;
+    setTimeout(() => {
+      document.getElementById('email-capture-block').style.display = 'none';
+      document.getElementById('post-save-block').style.display = 'block';
+    }, 1500);
+  }
+
+  function skipSave() {
+    document.getElementById('email-capture-block').style.display = 'none';
+    document.getElementById('post-save-block').style.display = 'block';
+  }
+
+  function buildSummary() {
+    if (!resultData) return 'No strong layer identified.';
+    let s = 'Primary layer: ' + resultData.name + '\n\n' + resultData.title + '\n\n' + resultData.desc + '\n\nWhat this means: ' + resultData.insight + '\n\nWhat to focus on next: ' + resultData.next;
+    if (secondaryLayers.length > 0) s += '\n\nOther layers worth noting: ' + secondaryLayers.map(l => l.name).join(', ');
+    return s;
+  }
+
+  async function copyResult() {
+    try {
+      await navigator.clipboard.writeText(buildSummary());
+      alert('Result copied to clipboard.');
+    } catch(e) { alert('Could not copy automatically.'); }
+  }
+
+  updateProgress(0);
+</script>
+</body>
+</html>
