@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Activation Scan: Flux Forward</title>
+  <meta name="description" content="A 2-minute diagnostic for internationals in the Netherlands. Find out which layer may be getting in the way of your progress." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,600;0,700;1,700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #E8201A; --red-dark: #b8180f; --red-light: #fdf0ef;
+      --text: #0a0a0a; --text-muted: #555; --text-hint: #999;
+      --border: rgba(0,0,0,0.12); --border-strong: rgba(0,0,0,0.25);
+      --bg: #fff; --bg-off: #f5f5f5;
+      --green: #117a3f; --green-light: #eef8f2;
+    }
+    body { font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    nav { padding: 1.1rem 2rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+    .nav-logo { text-decoration: none; }
+    .logo-text { font-weight: 700; font-size: 15px; letter-spacing: 0.05em; color: var(--text); text-transform: uppercase; }
+    .nav-tag { font-size: 11px; font-weight: 700; color: var(--text-hint); letter-spacing: 0.1em; text-transform: uppercase; }
+    .hero { padding: 4.5rem 2rem 3.5rem; text-align: center; max-width: 720px; margin: 0 auto; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); margin-bottom: 1.75rem; }
+    .hero-badge::before, .hero-badge::after { content: ''; display: block; width: 28px; height: 1px; background: var(--red); opacity: 0.4; }
+    .hero h1 { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: clamp(2.6rem, 6.5vw, 4.2rem); line-height: 1.0; text-transform: uppercase; color: var(--text); margin-bottom: 1.25rem; }
+    .hero h1 em { font-style: italic; color: var(--red); }
+    .hero p { font-size: 17px; color: var(--text-muted); line-height: 1.7; max-width: 540px; margin: 0 auto 2.5rem; }
+    .hero-meta { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-hint); }
+    .hero-meta-item { padding: 0 1.25rem; }
+    .hero-meta-item:not(:last-child) { border-right: 1px solid var(--border); }
+    .scan-container { max-width: 620px; margin: 0 auto 6rem; padding: 0 1.5rem; width: 100%; }
+    .scan-card { background: var(--bg); border: 1.5px solid var(--text); padding: 2.5rem; }
+    .progress-track { height: 3px; background: var(--bg-off); margin-bottom: 0.75rem; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--red); transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
+    .progress-text { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-hint); margin-bottom: 2rem; }
+    .step { display: none; animation: fadeUp 0.25s ease both; }
+    .step.active { display: block; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .step-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); margin-bottom: 1rem; }
+    .question-text { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; line-height: 1.25; color: var(--text); margin-bottom: 0.6rem; text-transform: uppercase; }
+    .question-context { font-size: 13px; color: var(--text-hint); font-style: italic; line-height: 1.6; margin-bottom: 1.5rem; border-left: 2px solid var(--border); padding-left: 0.75rem; }
+    .choice-wrap { display: flex; flex-direction: column; gap: 8px; margin-bottom: 2rem; }
+    .choice-option { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; border: 1px solid var(--border); cursor: pointer; transition: border-color 0.12s, background 0.12s; background: var(--bg); user-select: none; }
+    .choice-option:hover { border-color: var(--text); background: var(--bg-off); }
+    .choice-option.selected { border-color: var(--red); background: var(--red-light); }
+    .choice-dot { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--border-strong); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.12s; margin-top: 1px; }
+    .choice-option.selected .choice-dot { background: var(--red); border-color: var(--red); }
+    .choice-inner { width: 7px; height: 7px; border-radius: 50%; background: white; opacity: 0; transition: opacity 0.12s; }
+    .choice-option.selected .choice-inner { opacity: 1; }
+    .choice-text { font-size: 14px; color: var(--text); line-height: 1.5; }
+    .preview-intro { font-size: 16px; color: var(--text-muted); line-height: 1.75; margin-bottom: 2rem; }
+    .preview-what { margin-bottom: 2rem; }
+    .preview-what-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-hint); margin-bottom: 1rem; }
+    .layer-preview-item { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+    .layer-preview-item:last-child { border-bottom: none; }
+    .layer-preview-num { font-size: 11px; font-weight: 700; color: var(--red); width: 18px; flex-shrink: 0; padding-top: 2px; }
+    .layer-preview-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .layer-preview-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+    .preview-output { border-left: 3px solid var(--text); padding: 1rem 1rem 1rem 1.25rem; background: var(--bg-off); margin-bottom: 2rem; }
+    .preview-output-title { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-hint); margin-bottom: 0.5rem; }
+    .preview-output-list { font-size: 14px; color: var(--text-muted); line-height: 1.8; padding-left: 1rem; }
+    .preview-read-more { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem; }
+    .preview-read-more a { color: var(--red); text-decoration: none; }
+    .preview-read-more a:hover { text-decoration: underline; }
+    .field { margin-bottom: 1.1rem; }
+    .field label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+    .field input[type="text"], .field input[type="email"] { width: 100%; padding: 12px 14px; border: 1px solid var(--border-strong); font-size: 15px; font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--text); outline: none; transition: border-color 0.12s; }
+    .field input:focus { border-color: var(--text); }
+    .gdpr-note { font-size: 12px; color: var(--text-hint); line-height: 1.6; margin-bottom: 1.5rem; }
+    .gdpr-note a { color: var(--text-hint); text-decoration: underline; }
+    .btn-primary, .btn-secondary { width: 100%; padding: 15px; border: none; font-size: 12px; font-weight: 700; font-family: 'Barlow', sans-serif; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: background 0.12s, transform 0.1s, color 0.12s; }
+    .btn-primary { background: var(--text); color: white; }
+    .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+    .btn-primary:not(:disabled):hover { background: var(--red); }
+    .btn-primary:not(:disabled):active, .btn-secondary:active, .btn-cta:active { transform: scale(0.99); }
+    .btn-secondary { background: white; color: var(--text); border: 1px solid var(--border-strong); }
+    .btn-secondary:hover { background: var(--bg-off); }
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .email-capture { border: 1.5px solid var(--text); padding: 1.5rem; margin-bottom: 1.5rem; background: var(--bg-off); }
+    .email-capture-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; text-transform: uppercase; color: var(--text); margin-bottom: 0.4rem; }
+    .email-capture-sub { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.25rem; }
+    .email-capture-success { font-size: 14px; color: var(--green); font-weight: 600; padding: 0.75rem 0; display: none; }
+    .result-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); margin-bottom: 0.75rem; }
+    .result-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 30px; line-height: 1.1; color: var(--text); text-transform: uppercase; margin-bottom: 1rem; }
+    .result-desc { font-size: 15px; color: var(--text-muted); line-height: 1.75; margin-bottom: 1.5rem; }
+    .insight-box { border-left: 3px solid var(--red); padding: 1.25rem 1.25rem 1.25rem 1.5rem; background: var(--red-light); margin-bottom: 1rem; }
+    .insight-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red-dark); margin-bottom: 7px; }
+    .insight-text { font-size: 14px; color: #5a1410; line-height: 1.7; }
+    .next-box { border-left: 3px solid var(--green); padding: 1.25rem 1.25rem 1.25rem 1.5rem; background: var(--green-light); margin-bottom: 1.5rem; }
+    .next-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); margin-bottom: 7px; }
+    .next-text { font-size: 14px; color: #0d5a2f; line-height: 1.7; }
+    .all-layers { margin-bottom: 1.5rem; }
+    .all-layers-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-hint); margin-bottom: 0.75rem; }
+    .layer-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .layer-row:last-child { border-bottom: none; }
+    .layer-row-name { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
+    .layer-bar-wrap { width: 120px; height: 6px; background: var(--bg-off); border: 1px solid var(--border); }
+    .layer-bar-fill { height: 100%; background: var(--red); transition: width 0.6s ease; }
+    .layer-bar-fill.low { background: #ccc; }
+    .layer-score-label { font-size: 11px; font-weight: 700; color: var(--text-hint); width: 60px; text-align: right; text-transform: uppercase; letter-spacing: 0.05em; }
+    .secondary-section { margin-bottom: 1.5rem; }
+    .secondary-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-hint); margin-bottom: 1rem; }
+    .secondary-layer { border: 1px solid var(--border); padding: 1rem 1.25rem; margin-bottom: 0.5rem; }
+    .secondary-layer-name { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+    .secondary-layer-text { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .accuracy-box { border: 1px solid var(--border); padding: 1.25rem; margin-bottom: 1.5rem; background: var(--bg-off); }
+    .accuracy-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; }
+    .accuracy-sub { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 0.75rem; }
+    .accuracy-link { font-size: 13px; color: var(--red); text-decoration: none; font-weight: 600; }
+    .accuracy-link:hover { text-decoration: underline; }
+    .divider { height: 1px; background: var(--border); margin: 2rem 0; }
+    .btn-inline { display: block; width: 100%; padding: 14px 16px; background: white; color: var(--text); border: 1px solid var(--border-strong); font-size: 12px; font-weight: 700; font-family: 'Barlow', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; text-align: center; text-decoration: none; cursor: pointer; transition: background 0.12s; margin-bottom: 2rem; }
+    .btn-inline:hover { background: var(--bg-off); }
+    .cta-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; text-transform: uppercase; color: var(--text); margin-bottom: 0.5rem; }
+    .cta-sub { font-size: 14px; color: var(--text-muted); line-height: 1.65; margin-bottom: 1.25rem; }
+    .btn-cta { display: block; width: 100%; padding: 16px; background: var(--red); color: white; border: none; font-size: 12px; font-weight: 700; font-family: 'Barlow', sans-serif; letter-spacing: 0.12em; text-transform: uppercase; text-align: center; text-decoration: none; cursor: pointer; transition: background 0.12s, transform 0.1s; }
+    .btn-cta:hover { background: var(--red-dark); }
+    .minor-links { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .minor-link { font-size: 13px; color: var(--text-muted); text-decoration: none; }
+    .minor-link:hover { color: var(--red); }
+
+    /* GUIDED ACTIVATION LAYER */
+    .guided-layer { animation: fadeUp 0.3s ease both; }
+    .guided-intro { font-size: 15px; color: var(--text-muted); line-height: 1.7; margin-bottom: 1.5rem; }
+    .guided-question { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; line-height: 1.25; color: var(--text); margin-bottom: 1.5rem; text-transform: uppercase; }
+    .guided-choices { display: flex; flex-direction: column; gap: 8px; margin-bottom: 2rem; }
+    .guided-choice { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; border: 1px solid var(--border); cursor: pointer; transition: border-color 0.12s, background 0.12s; background: var(--bg); user-select: none; }
+    .guided-choice:hover { border-color: var(--text); background: var(--bg-off); }
+    .guided-choice.selected { border-color: var(--red); background: var(--red-light); }
+    .guided-choice-dot { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--border-strong); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.12s; margin-top: 2px; }
+    .guided-choice.selected .guided-choice-dot { background: var(--red); border-color: var(--red); }
+    .guided-choice-dot-inner { width: 7px; height: 7px; border-radius: 50%; background: white; opacity: 0; transition: opacity 0.12s; }
+    .guided-choice.selected .guided-choice-dot-inner { opacity: 1; }
+    .guided-choice-text { font-size: 14px; color: var(--text); line-height: 1.5; }
+    .guided-response { display: none; animation: fadeUp 0.3s ease both; }
+    .guided-response.visible { display: block; }
+    .guided-interpretation { border-left: 3px solid var(--text); padding: 1.25rem 1.25rem 1.25rem 1.5rem; background: var(--bg-off); margin-bottom: 1rem; }
+    .guided-interpretation-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-hint); margin-bottom: 7px; }
+    .guided-interpretation-text { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+    .guided-next { border-left: 3px solid var(--green); padding: 1.25rem 1.25rem 1.25rem 1.5rem; background: var(--green-light); margin-bottom: 1.5rem; }
+    .guided-next-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); margin-bottom: 7px; }
+    .guided-next-text { font-size: 14px; color: #0d5a2f; line-height: 1.7; }
+    .guided-support { border: 1px solid var(--border); padding: 1.25rem; background: var(--bg-off); margin-bottom: 1.5rem; }
+    .guided-support-text { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 0.75rem; }
+    .guided-support-link { font-size: 13px; color: var(--red); text-decoration: none; font-weight: 600; }
+    .guided-support-link:hover { text-decoration: underline; }
+    .guided-back { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); cursor: pointer; background: none; border: none; padding: 0; margin-bottom: 1.5rem; font-family: 'Barlow', sans-serif; }
+    .guided-back:hover { color: var(--red); }
+    .guided-separator { height: 1px; background: var(--border); margin: 2rem 0; }
+    .guided-entry { border: 1.5px solid var(--text); padding: 1.5rem; margin-top: 2rem; }
+    .guided-entry-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); margin-bottom: 0.75rem; }
+    .guided-entry-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; text-transform: uppercase; color: var(--text); margin-bottom: 0.5rem; }
+    .guided-entry-sub { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.25rem; }
+
+    footer { margin-top: auto; padding: 2rem; text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-hint); border-top: 1px solid var(--border); }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--red); }
+    @media (max-width: 600px) {
+      .scan-card { padding: 1.75rem 1.25rem; }
+      .hero { padding: 3rem 1.5rem 2rem; }
+      .hero-meta { flex-wrap: wrap; }
+      .hero-meta-item { border: none !important; padding: 0.25rem 0.75rem; }
+      .btn-row { grid-template-columns: 1fr; }
+      .layer-bar-wrap { width: 80px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="https://fluxforward.world" class="nav-logo"><span class="logo-text">Flux Forward</span></a>
+  <span class="nav-tag">Activation Scan</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">Free diagnostic</div>
+  <h1>Find out what's <em>actually</em><br>getting in the way.</h1>
+  <p>Whether things are moving well or not quite yet, this scan helps you see where to focus. It maps your situation across 5 layers, and gives you something specific to work with.</p>
+  <div class="hero-meta">
+    <span class="hero-meta-item">5 questions</span>
+    <span class="hero-meta-item">2 minutes</span>
+    <span class="hero-meta-item">No signup needed</span>
+  </div>
+</div>
+
+<div class="scan-container">
+  <div class="scan-card">
+    <div class="progress-track"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+    <div class="progress-text" id="progress-text"></div>
+
+    <!-- STEP 0: PREVIEW -->
+    <div class="step active" id="step-0">
+      <div class="step-label">Before you start</div>
+      <div class="question-text">What is this scan?</div>
+      <p class="preview-intro">Flux Forward works with internationals navigating the Dutch market. Over time, after hundreds of conversations, we identified 5 specific layers where progress tends to slow down. Most people are dealing with 1 or 2 of them, but rarely know which ones. This scan helps you find out.</p>
+      <div class="helper-box" style="margin-bottom:1.5rem;">
+        <div class="helper-title">Who this is for</div>
+        <div class="helper-text" style="margin-bottom:0.5rem;">Internationals in the Netherlands in an active transition phase: job seeking, navigating a career change, or trying to find your footing here. The transition looks different for everyone. Some experience it in year one, others in year five or beyond.</div>
+        <div class="helper-title" style="margin-top:0.75rem;">Who this is not for</div>
+        <div class="helper-text">People who are settled, not in active transition, or not navigating the Dutch market. The questions are designed for a specific context. If that’s not where you are, the results may not be meaningful.</div>
+      </div>
+      <div class="preview-what">
+        <div class="preview-what-title">The 5 layers</div>
+        <div class="layer-preview-item"><div class="layer-preview-num">1</div><div><div class="layer-preview-name">Priority Confusion</div><div class="layer-preview-desc">Too many directions at once, no clear decision structure.</div></div></div>
+        <div class="layer-preview-item"><div class="layer-preview-num">2</div><div><div class="layer-preview-name">System Blindness</div><div class="layer-preview-desc">The system is still partly invisible. Effort lands in the obvious places but not always the effective ones.</div></div></div>
+        <div class="layer-preview-item"><div class="layer-preview-num">3</div><div><div class="layer-preview-name">Positioning Collapse</div><div class="layer-preview-desc">Your experience is real, but it's not landing clearly in this context.</div></div></div>
+        <div class="layer-preview-item"><div class="layer-preview-num">4</div><div><div class="layer-preview-name">Execution Fragmentation</div><div class="layer-preview-desc">Effort is spread too wide to build traction. Each week starts from zero.</div></div></div>
+        <div class="layer-preview-item"><div class="layer-preview-num">5</div><div><div class="layer-preview-name">Capacity Breakdown</div><div class="layer-preview-desc">Capacity has quietly dropped. Pushing harder is making things harder, not better.</div></div></div>
+      </div>
+      <div class="preview-output">
+        <div class="preview-output-title">What you'll get</div>
+        <ul class="preview-output-list">
+          <li>Your primary layer with a full explanation</li>
+          <li>A visual picture of all 5 layers</li>
+          <li>One specific next step</li>
+          <li>Option to save your result by email</li>
+        </ul>
+      </div>
+      <div class="preview-read-more">Want to understand the framework first? Read: <a href="https://blog.fluxforward.world/p/youre-not-stuck-youre-misdiagnosed" target="_blank">You're not stuck. You're misdiagnosed.</a> or <a href="https://blog.fluxforward.world/p/how-activation-actually-happens" target="_blank">How activation actually happens.</a></div>
+      <button class="btn-primary" onclick="goNext(0)">Start the scan, no signup needed →</button>
+    </div>
+
+    <!-- STEP 1: Priority Confusion -->
+    <div class="step" id="step-1">
+      <div class="step-label">Question 1 of 5</div>
+      <div class="question-text">In the past two weeks, how many different directions have you actively been pursuing at the same time?</div>
+      <div class="question-context">Many people arrive in the Netherlands with a clear goal, then find the context shifts what's possible or desirable. This question looks at whether that's created a decision gap.</div>
+      <div class="choice-wrap" id="choices-1"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(1)">← Back</button>
+        <button class="btn-primary" id="btn-1" onclick="goNext(1)" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: System Blindness -->
+    <div class="step" id="step-2">
+      <div class="step-label">Question 2 of 5</div>
+      <div class="question-text">When you think about your last 5 opportunities or conversations. How did most of them come about?</div>
+      <div class="question-context">The Dutch job market has a visible layer and an invisible one. Most people start with what they can see. This question checks whether the invisible part is still unclear.</div>
+      <div class="choice-wrap" id="choices-2"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(2)">← Back</button>
+        <button class="btn-primary" id="btn-2" onclick="goNext(2)" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Positioning Collapse -->
+    <div class="step" id="step-3">
+      <div class="step-label">Question 3 of 5</div>
+      <div class="question-text">When someone asks what you do or what you're looking for here. What usually happens?</div>
+      <div class="question-context">Moving countries often creates a translation gap, not in language, but in how your value is read. Strong experience doesn't automatically land the same way in a new context.</div>
+      <div class="choice-wrap" id="choices-3"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(3)">← Back</button>
+        <button class="btn-primary" id="btn-3" onclick="goNext(3)" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Execution Fragmentation -->
+    <div class="step" id="step-4">
+      <div class="step-label">Question 4 of 5</div>
+      <div class="question-text">Looking at last week. Which of these best describes how you spent your energy?</div>
+      <div class="question-context">Activity and progress are not the same thing. This question looks at whether your effort is concentrated enough to create a loop, or spread too wide to compound.</div>
+      <div class="choice-wrap" id="choices-4"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(4)">← Back</button>
+        <button class="btn-primary" id="btn-4" onclick="goNext(4)" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Capacity Breakdown -->
+    <div class="step" id="step-5">
+      <div class="step-label">Question 5 of 5</div>
+      <div class="question-text">When you think about the next step you know you should take. What gets in the way most often?</div>
+      <div class="question-context">Long transitions quietly deplete capacity. This isn't a character issue. It's a system issue. When capacity drops, more pressure usually creates more friction, not more progress.</div>
+      <div class="choice-wrap" id="choices-5"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(5)">← Back</button>
+        <button class="btn-primary" id="btn-5" onclick="goNext(5)" disabled>See my result →</button>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="step" id="step-result">
+      <div class="result-eyebrow" id="r-eyebrow">Your primary layer</div>
+      <div class="result-title" id="r-title"></div>
+      <div class="result-desc" id="r-desc"></div>
+      <div class="insight-box">
+        <div class="insight-label">What this means</div>
+        <div class="insight-text" id="r-insight"></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">What to focus on next</div>
+        <div class="next-text" id="r-next"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="all-layers" id="r-all-layers">
+        <div class="all-layers-title">Your full picture</div>
+        <div id="all-layers-list"></div>
+      </div>
+      <div class="secondary-section" id="r-secondary" style="display:none">
+        <div class="secondary-title">Other layers worth noting</div>
+        <div id="r-secondary-list"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="accuracy-box">
+        <div class="accuracy-title">Does this feel accurate to you?</div>
+        <div class="accuracy-sub">Results are based on 5 questions. They're a starting point, not a full picture. If something doesn't land, we'd like to know. You can reply directly or book a call to go deeper.</div>
+        <a class="accuracy-link" href="mailto:hi@fluxforward.world?subject=Activation Scan feedback">Share your thoughts →</a>
+      </div>
+
+      <div class="guided-entry" id="guided-entry-block">
+        <div class="guided-entry-label">Go deeper</div>
+        <div class="guided-entry-title">Let's make this more concrete.</div>
+        <div class="guided-entry-sub">Your result is a starting point. These next questions help you find the specific situation that fits yours, and give you one clear action to take.</div>
+        <button class="btn-primary" onclick="startGuidedLayer()">Find my specific situation →</button>
+      </div>
+
+      <!-- GUIDED LAYER -->
+      <div class="guided-layer" id="guided-layer" style="display:none;">
+        <div class="guided-separator"></div>
+        <button class="guided-back" onclick="hideGuidedLayer()">← Back to result</button>
+        <div class="step-label" id="guided-layer-label">Going deeper</div>
+        <div class="guided-question" id="guided-question-text"></div>
+        <div class="guided-choices" id="guided-choices-list"></div>
+        <div class="guided-response" id="guided-response">
+          <div class="guided-interpretation">
+            <div class="guided-interpretation-label">What this usually means</div>
+            <div class="guided-interpretation-text" id="guided-interp-text"></div>
+          </div>
+          <div class="guided-next">
+            <div class="guided-next-label">Your next step</div>
+            <div class="guided-next-text" id="guided-next-text"></div>
+          </div>
+          <div class="guided-support" id="guided-support-block">
+            <div class="guided-support-text" id="guided-support-text"></div>
+            <a class="guided-support-link" href="https://calendly.com/flux-forward/activation-scan-call" target="_blank">Book a free Activation Scan call →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="email-capture" id="email-capture-block">
+        <div class="email-capture-title">Save your result</div>
+        <div class="email-capture-sub">Enter your email and we'll keep a copy so you can follow up later.</div>
+        <div class="field"><label>First name</label><input type="text" id="fname" placeholder="Your name" oninput="checkEmail()" /></div>
+        <div class="field"><label>Email address</label><input type="email" id="email" placeholder="you@example.com" oninput="checkEmail()" /></div>
+        <div class="field" style="flex-direction:row;align-items:flex-start;gap:10px;display:flex;">
+          <input type="checkbox" id="newsletter" style="margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:var(--red);cursor:pointer;" />
+          <label for="newsletter" style="font-size:13px;color:var(--text-muted);line-height:1.5;cursor:pointer;text-transform:none;letter-spacing:0;">Keep me updated with insights and resources for internationals in the Netherlands.</label>
+        </div>
+        <div class="gdpr-note">Your data is stored securely via Formspree and used only to send your result and, if you opt in, occasional updates from Flux Forward. We never share it with third parties. You can request deletion at any time by emailing <a href="mailto:hi@fluxforward.world">hi@fluxforward.world</a>.</div>
+        <button class="btn-primary" id="btn-save" onclick="saveResult()" disabled style="margin-bottom:0.75rem;">Save my result →</button>
+        <div class="email-capture-success" id="save-success">Saved. We'll be in touch if useful.</div>
+        <button class="btn-secondary" onclick="skipSave()" style="font-size:11px;padding:10px;margin-top:0.5rem;">No thanks, skip this</button>
+      </div>
+      <div id="post-save-block" style="display:none;">
+        <button class="btn-inline" onclick="copyResult()">Copy result summary</button>
+      </div>
+      <div class="cta-title" id="cta-title">Want help making this practical?</div>
+      <div class="cta-sub" id="cta-sub">Book a free 15-minute Activation Scan call. We’ll go through your result together and give you one clear next step.</div>
+      <a class="btn-cta" id="cta-btn" href="https://calendly.com/flux-forward/activation-scan-call" target="_blank">Book your free Activation Scan →</a>
+      <div class="minor-links">
+        <a class="minor-link" href="https://blog.fluxforward.world/p/youre-not-stuck-youre-misdiagnosed" target="_blank">Read: You're not stuck. You're misdiagnosed. →</a>
+        <a class="minor-link" href="https://blog.fluxforward.world/p/how-activation-actually-happens" target="_blank">Read: How activation actually happens. →</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <p><a href="https://fluxforward.world">Flux Forward</a>. Activating and retaining talent for the Dutch economy.</p>
+</footer>
+
+<script>
+  // Each question: array of {text, layer_index, score}
+  // layer_index: 0=Priority, 1=System, 2=Positioning, 3=Execution, 4=Capacity
+  const questions = [
+    {
+      choices: [
+        { text: "Just one, clearly defined", layer: 0, score: 1 },
+        { text: "Two or three, with some overlap", layer: 0, score: 2 },
+        { text: "Four or more, hard to keep track", layer: 0, score: 4 },
+        { text: "I'm not sure. It changes week to week", layer: 0, score: 5 }
+      ]
+    },
+    {
+      choices: [
+        { text: "Mostly through platforms I searched (LinkedIn, job boards)", layer: 1, score: 5 },
+        { text: "A mix of platforms and people I already knew", layer: 1, score: 3 },
+        { text: "Mostly through people who reached out or referred me", layer: 1, score: 1 },
+        { text: "I haven't had many opportunities or conversations recently", layer: 1, score: 4 }
+      ]
+    },
+    {
+      choices: [
+        { text: "I explain it clearly and they get it quickly", layer: 2, score: 1 },
+        { text: "I explain it but often get vague or uncertain reactions", layer: 2, score: 3 },
+        { text: "I struggle to find the right framing for this context", layer: 2, score: 5 },
+        { text: "I tend to give different answers depending on who's asking", layer: 2, score: 4 }
+      ]
+    },
+    {
+      choices: [
+        { text: "Focused on one clear track with consistent actions", layer: 3, score: 1 },
+        { text: "Split across 2–3 things, some progress on each", layer: 3, score: 2 },
+        { text: "Spread across many things, hard to point to clear progress", layer: 3, score: 5 },
+        { text: "Mostly reactive, responding to things as they came up", layer: 3, score: 4 }
+      ]
+    },
+    {
+      choices: [
+        { text: "Nothing much. I usually follow through", layer: 4, score: 1 },
+        { text: "Uncertainty about whether it's the right step", layer: 0, score: 3 },
+        { text: "Low energy or motivation to start", layer: 4, score: 5 },
+        { text: "Too many competing priorities pulling me elsewhere", layer: 3, score: 4 }
+      ]
+    }
+  ];
+
+  const layers = [
+    { name:"Priority Confusion", title:"You're spread across too many directions.", desc:"You have motivation and capacity, but no clear decision structure guiding your next move. When everything feels equally important, nothing moves forward. This is not about lacking ambition.", insight:"The issue is hierarchy, not effort. If everything matters at once, your energy keeps leaking across options instead of concentrating on one.", next:"Pick one path, one geography, and one timeframe first. Don't solve the whole future at once. Force one real trade-off so your effort can finally land somewhere.", shortDesc:"Energy spread across too many options without a clear decision structure." },
+    { name:"System Blindness", title:"You can't fully navigate a system you can't yet see.", desc:"You're working hard on the visible parts of the market: job boards, LinkedIn, applications. But a lot of real movement happens in the less visible parts: referrals, informal networks, and understanding how things actually work here.", insight:"The problem is not that you're inactive. It's that the system is still partly invisible to you, so your effort is landing in the obvious places but not always in the effective ones.", next:"Don't just apply more. Spend time learning how opportunities actually move in your field here. One useful conversation or referral path can matter more than ten extra applications.", shortDesc:"The system is still partly invisible, so effort lands in the obvious places but not always the effective ones." },
+    { name:"Positioning Collapse", title:"Your experience isn't landing the way you intend.", desc:"Your background is real, but after migration, the way it's understood by the market has shifted. You may be using language that's too broad, too generic, or hard to read in this context.", insight:"This is not a skills problem. It's a clarity problem. If people can't quickly understand what you bring, your real value stays invisible, even when you're in the room.", next:"Sharpen how you explain your direction, your experience, and your impact. Start with one thing: your headline, your About, or one experience section. Make it easier to understand in under a minute.", shortDesc:"Your value is real but not reading clearly in this context." },
+    { name:"Execution Fragmentation", title:"You're active, but nothing is compounding.", desc:"You are doing things. You are trying. But your effort is spread across too many directions, and without a repeatable loop, momentum can't build. Each week feels like starting over.", insight:"The issue is not laziness. It's fragmentation. When your effort is scattered across multiple tracks, nothing accumulates and nothing compounds.", next:"Reduce the number of moving parts. Choose one focus, one loop, and one priority for the next two weeks. Progress builds when it is concentrated, not when it is spread wide.", shortDesc:"Effort is spread too wide to build traction. Each week starts from zero." },
+    { name:"Capacity Breakdown", title:"Your system is running low on fuel.", desc:"After months of pressure, uncertainty, and setbacks, your ability to keep pushing has quietly dropped. At this stage, trying harder often backfires. It leads to rushed decisions and deeper fatigue.", insight:"What looks like lack of discipline may actually be depleted capacity. If your system is overloaded, forcing more effort usually creates more friction, not more progress.", next:"Stabilize first. Protect sleep, reduce noise, and stop treating recovery as a reward. Getting your energy back is not a distraction from progress. It is the base for it.", shortDesc:"Capacity has quietly dropped. Pushing harder is making things harder, not better." }
+  ];
+
+  // scores per layer
+  const layerScores = [0, 0, 0, 0, 0];
+  const selectedChoices = [null, null, null, null, null];
+  let currentStep = 0;
+  let resultData = null;
+  let secondaryLayers = [];
+
+  // Build choice UIs
+  for (let q = 1; q <= 5; q++) {
+    const wrap = document.getElementById('choices-' + q);
+    questions[q-1].choices.forEach((choice, ci) => {
+      const el = document.createElement('div');
+      el.className = 'choice-option';
+      el.innerHTML = '<div class="choice-dot"><div class="choice-inner"></div></div><div class="choice-text">' + choice.text + '</div>';
+      el.addEventListener('click', () => {
+        wrap.querySelectorAll('.choice-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedChoices[q-1] = ci;
+        document.getElementById('btn-' + q).disabled = false;
+      });
+      wrap.appendChild(el);
+    });
+  }
+
+  function computeScores() {
+    layerScores.fill(0);
+    for (let q = 0; q < 5; q++) {
+      const ci = selectedChoices[q];
+      if (ci === null) continue;
+      const choice = questions[q].choices[ci];
+      layerScores[choice.layer] += choice.score;
+    }
+  }
+
+  function updateProgress(step) {
+    currentStep = step;
+    const pct = step >= 6 ? 100 : Math.round((step / 6) * 100);
+    document.getElementById('progress').style.width = pct + '%';
+    const labels = ['', 'Question 1 of 5', 'Question 2 of 5', 'Question 3 of 5', 'Question 4 of 5', 'Question 5 of 5', 'Result ready'];
+    document.getElementById('progress-text').textContent = labels[step] || '';
+  }
+
+  function checkEmail() {
+    const name = document.getElementById('fname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    document.getElementById('btn-save').disabled = !(name.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+  }
+
+  function goNext(from) {
+    document.getElementById('step-' + from).classList.remove('active');
+    if (from === 5) { showResult(); return; }
+    document.getElementById('step-' + (from + 1)).classList.add('active');
+    updateProgress(from + 1);
+    window.scrollTo(0, 0);
+  }
+
+  function goBack(from) {
+    document.getElementById('step-' + from).classList.remove('active');
+    document.getElementById('step-' + (from - 1)).classList.add('active');
+    updateProgress(from - 1);
+    window.scrollTo(0, 0);
+  }
+
+  function getScoreLabel(score) {
+    if (score === 0) return 'Not present';
+    if (score <= 2) return 'Low';
+    if (score <= 4) return 'Moderate';
+    if (score <= 6) return 'High';
+    return 'Very high';
+  }
+
+  function isLowResult(maxScore) {
+    return maxScore <= 2;
+  }
+
+  function showResult() {
+    computeScores();
+    const maxScore = Math.max(...layerScores);
+    let primaryIdx = layerScores.indexOf(maxScore);
+    resultData = { idx: primaryIdx, ...layers[primaryIdx] };
+
+    if (isLowResult(maxScore)) {
+      document.getElementById('r-eyebrow').textContent = 'Your result';
+      document.getElementById('r-title').textContent = 'Things seem to be in a relatively clear place right now.';
+      document.getElementById('r-desc').textContent = "Based on your answers, none of the 5 layers we track appear to be significantly blocking your progress right now. That's a good sign.";
+      document.getElementById('r-insight').textContent = "This could mean things are genuinely flowing well for you, or that the friction in your situation isn't captured by these 5 layers yet. Either way, it's worth a quick conversation to see what's actually happening.";
+      document.getElementById('r-next').textContent = "If you're in a good place, the next step is keeping it that way. If something does feel off but didn't show up here, a short conversation often reveals it quickly. Either way, we're happy to take a look together.";
+      document.getElementById('r-all-layers').style.display = 'none';
+      document.getElementById('r-secondary').style.display = 'none';
+    } else {
+      document.getElementById('r-title').textContent = resultData.title;
+      document.getElementById('r-desc').textContent = resultData.desc;
+      document.getElementById('r-insight').textContent = resultData.insight;
+      document.getElementById('r-next').textContent = resultData.next;
+
+      const allLayersList = document.getElementById('all-layers-list');
+      allLayersList.innerHTML = '';
+      const maxPossible = 10;
+      layers.forEach((layer, i) => {
+        const score = layerScores[i];
+        const pct = Math.round((score / maxPossible) * 100);
+        const isPrimary = i === primaryIdx;
+        const row = document.createElement('div');
+        row.className = 'layer-row';
+        row.innerHTML = '<div class="layer-row-name" style="' + (isPrimary ? 'font-weight:700;color:var(--red);' : '') + '">' + layer.name + (isPrimary ? ' ↑' : '') + '</div><div class="layer-bar-wrap"><div class="layer-bar-fill ' + (score <= 2 ? 'low' : '') + '" style="width:' + Math.min(pct, 100) + '%"></div></div><div class="layer-score-label">' + getScoreLabel(score) + '</div>';
+        allLayersList.appendChild(row);
+      });
+
+      const secondaries = layerScores.map((s, i) => ({ s, i })).filter(x => x.i !== primaryIdx && x.s >= 3);
+      secondaryLayers = secondaries.map(x => layers[x.i]);
+      const secondaryList = document.getElementById('r-secondary-list');
+      secondaryList.innerHTML = '';
+      if (secondaries.length > 0) {
+        secondaries.sort((a, b) => b.s - a.s);
+        secondaries.forEach(x => {
+          const l = layers[x.i];
+          const item = document.createElement('div');
+          item.className = 'secondary-layer';
+          item.innerHTML = '<div class="secondary-layer-name">' + l.name + '</div><div class="secondary-layer-text">' + l.shortDesc + '</div>';
+          secondaryList.appendChild(item);
+        });
+        document.getElementById('r-secondary').style.display = 'block';
+      }
+    }
+
+    document.getElementById('step-result').classList.add('active');
+    updateProgress(6);
+    window.scrollTo(0, 0);
+
+    // Layer-specific CTA
+    const ctaMessages = {
+      'Priority Confusion': { title: 'Not sure which path to take?', sub: "In a free 15-minute call, we'll help you cut through the options and identify one clear direction to commit to." },
+      'System Blindness': { title: 'The system is still partly invisible?', sub: "In a free 15-minute call, we'll show you what's actually moving in your field here, and where to put your effort." },
+      'Positioning Collapse': { title: 'Your value isn’t landing clearly?', sub: "In a free 15-minute call, we'll help you sharpen how you present yourself so the right people understand what you bring." },
+      'Execution Fragmentation': { title: 'Too many things, not enough traction?', sub: "In a free 15-minute call, we'll help you pick one loop and commit to it, so effort starts compounding." },
+      'Capacity Breakdown': { title: 'Running low on fuel to keep going?', sub: "In a free 15-minute call, we'll help you identify what’s draining you and what one thing would actually help right now." },
+      'low_score': { title: 'Want a second opinion?', sub: "If things are going well, great. If something still feels off, a short conversation often reveals what’s actually happening." }
+    };
+    const layerName = resultData ? resultData.name : 'low_score';
+    const ctaMsg = ctaMessages[layerName] || ctaMessages['low_score'];
+    if (document.getElementById('cta-title')) document.getElementById('cta-title').textContent = ctaMsg.title;
+    if (document.getElementById('cta-sub')) document.getElementById('cta-sub').textContent = ctaMsg.sub;
+
+    try {
+      localStorage.setItem('ff_scan_v24_result'
+, JSON.stringify({ primaryLayer: resultData ? resultData.name : 'low_score', layerScores, savedAt: new Date().toISOString() }));
+    } catch(e) {}
+  }
+
+  async function saveResult() {
+    const name = document.getElementById('fname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    if (!name || !email) return;
+    try {
+      await fetch('https://formspree.io/f/xaqabvgd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          name, email,
+          source: 'Activation Scan V2.4',
+          newsletter: document.getElementById('newsletter').checked ? 'yes' : 'no',
+          primary_layer: resultData ? resultData.name : 'low_score',
+          primary_title: resultData ? resultData.title : '',
+          primary_next: resultData ? resultData.next : '',
+          secondary_layers: secondaryLayers.map(l => l.name).join(', '),
+          score_priority_confusion: layerScores[0],
+          score_system_blindness: layerScores[1],
+          score_positioning: layerScores[2],
+          score_execution: layerScores[3],
+          score_capacity: layerScores[4]
+        })
+      });
+    } catch(e) { console.log('Formspree error:', e); }
+    document.getElementById('save-success').style.display = 'block';
+    document.getElementById('btn-save').disabled = true;
+    setTimeout(() => {
+      document.getElementById('email-capture-block').style.display = 'none';
+      document.getElementById('post-save-block').style.display = 'block';
+    }, 1500);
+  }
+
+  function skipSave() {
+    document.getElementById('email-capture-block').style.display = 'none';
+    document.getElementById('post-save-block').style.display = 'block';
+  }
+
+  function buildSummary() {
+    if (!resultData) return 'No strong layer identified.';
+    let s = 'Primary layer: ' + resultData.name + '\n\n' + resultData.title + '\n\n' + resultData.desc + '\n\nWhat this means: ' + resultData.insight + '\n\nWhat to focus on next: ' + resultData.next;
+    if (secondaryLayers.length > 0) s += '\n\nOther layers worth noting: ' + secondaryLayers.map(l => l.name).join(', ');
+    return s;
+  }
+
+  async function copyResult() {
+    try {
+      await navigator.clipboard.writeText(buildSummary());
+      alert('Result copied to clipboard.');
+    } catch(e) { alert('Could not copy automatically.'); }
+  }
+
+  // =====================
+  // GUIDED ACTIVATION LAYER DATA
+  // =====================
+  const guidedData = {
+    'Priority Confusion': {
+      question: 'When it comes to figuring out what to focus on, which of these feels closest?',
+      support: 'If the options still feel equally heavy, a short conversation usually cuts through it fast.',
+      situations: [
+        {
+          text: 'I have too many options and cannot commit to one.',
+          interp: 'The issue is not that your options are bad. It is that without a decision structure, every option stays equally valid forever. The longer you hold all of them open, the more energy leaks across all of them without anything moving forward.',
+          next: 'Write your top three options on paper. For each one, answer one question: "If I committed to this for the next 30 days, what would I do tomorrow?" The option with the clearest answer is probably your starting point.'
+        },
+        {
+          text: 'I know what I want, but I am not sure it is realistic here.',
+          interp: 'This is less about confusion and more about confidence in the local context. You have direction, but you are holding back because you are not sure the market will respond. That uncertainty often leads to hedging, which makes you less visible for the thing you actually want.',
+          next: 'Test it before concluding it is not viable. Apply for one role or reach out to one person in that direction this week. Real signal from the market is more useful than more time spent weighing it in your head.'
+        },
+        {
+          text: 'I keep switching between options depending on how each week goes.',
+          interp: 'When your direction changes with each piece of feedback or rejection, it is usually a sign that you have not committed to a direction yet. You are still testing which one feels safest. The result is that nothing compounds, and each week feels like starting over.',
+          next: 'Pick one direction for the next two weeks and do not change it regardless of what happens. Not because it is definitely right, but because consistency is what creates the data you need to actually evaluate it.'
+        },
+        {
+          text: 'I feel pressure to make the right decision, so I keep delaying.',
+          interp: 'The search for the right decision is often what prevents any decision. In practice, most directions become clearer through movement than through analysis. The cost of staying still is usually higher than the cost of starting in a slightly imperfect direction.',
+          next: 'Give yourself a deadline: by the end of this week, you will commit to one direction for the next month. Not forever. Just long enough to actually see what happens.'
+        },
+        {
+          text: 'I am not sure what I actually want anymore.',
+          interp: 'This sometimes happens after a long period of uncertainty or adaptation. The original goal got blurred by the pressures of the transition itself. What you wanted before you arrived may no longer fit who you have become here, and that gap has not been named yet.',
+          next: 'Set aside the question of what is realistic for a moment. Write down what you would pursue if you knew it would work. That answer often reveals what you actually want, which is a better starting point than what feels safe right now.'
+        }
+      ]
+    },
+    'System Blindness': {
+      question: 'When it comes to understanding how things actually work here, which of these feels closest?',
+      support: 'If the system still feels unclear, a conversation can help map what is actually relevant in your specific field.',
+      situations: [
+        {
+          text: 'I apply regularly but rarely hear back.',
+          interp: 'Low response rates on applications usually point to one of two things: the application itself is not landing clearly, or the channel is not the right one. Most opportunities in the Dutch market move through networks and referrals before they ever appear on a job board. Applying more to the same channels usually does not change the outcome.',
+          next: 'For your next five applications, identify one person at each company before applying. Send a short message first. Not a pitch, just a genuine question about their work. Applications that follow a real conversation get read differently.'
+        },
+        {
+          text: 'I do not really understand how hiring works in my field here.',
+          interp: 'Every field in the Netherlands has its own hiring logic. Some move almost entirely through referrals. Some rely heavily on recruitment agencies. Some have informal communities where most roles are discussed before they are posted. Without knowing the specific pattern in your field, effort tends to go into the most visible channels, which are often the least effective.',
+          next: 'Find two or three people working in your field here and ask them one question: "How did you get your current role?" The answers will tell you more about how the system actually works than any job board.'
+        },
+        {
+          text: 'I am not sure who the right people are to connect with.',
+          interp: 'This usually means the landscape is still unclear. You do not yet have a working map of who matters in your field, which organizations are relevant, or how roles and decisions actually flow. Building that map is not a luxury. It is what makes the rest of your effort more effective.',
+          next: 'Pick one company or organization you are genuinely interested in. Spend 30 minutes mapping who works there in relevant roles. Then identify one person you could reach out to with a specific, genuine reason. One real connection in the right place is worth more than fifty applications.'
+        },
+        {
+          text: 'I know people, but I do not know how to turn connections into opportunities.',
+          interp: 'Having a network and knowing how to activate it are two different things. Most people are willing to help if they understand exactly what you are looking for. The gap is usually in how you ask, not in the relationships themselves.',
+          next: 'Reach out to one person you already know this week. Be specific: tell them exactly what kind of role or conversation you are looking for, and ask if they know anyone worth talking to. Vague requests get vague responses. Specific requests get real ones.'
+        },
+        {
+          text: 'I feel like I am on the outside of something but I cannot quite see what it is.',
+          interp: 'That feeling usually points to the invisible layer of the market. There are communities, conversations, and informal networks where things actually move, and they are not always easy to find from the outside. Being on the outside is not permanent, but it does require deliberate steps to get in.',
+          next: 'Find one community, event, or group in your field in the Netherlands and show up consistently for the next month. Not to pitch yourself, just to become a familiar presence. Familiarity is what opens the invisible layer.'
+        }
+      ]
+    },
+    'Positioning Collapse': {
+      question: 'When it comes to explaining your background here, which of these feels closest?',
+      support: 'If this still feels unclear, a short conversation usually makes it concrete fast.',
+      situations: [
+        {
+          text: 'I know what I have done, but I do not know how to frame it for this market.',
+          interp: 'Your experience is real and solid. The issue is translation, not of language, but of context. What made sense in your previous environment does not automatically carry the same weight here. The market needs a different signal.',
+          next: 'Pick one role or direction you are actually pursuing. Rewrite your LinkedIn headline as if you are speaking directly to someone hiring for that specific role, not summarizing your career. One clear signal lands better than a complete picture.'
+        },
+        {
+          text: 'I get different reactions depending on who I am talking to.',
+          interp: 'Inconsistent reactions usually mean your positioning is not anchored yet. You are adjusting your story based on the audience, which creates noise. When the message changes, the market cannot build a clear picture of you.',
+          next: 'Write one version of your story that you use consistently, regardless of who is asking. It does not need to cover everything. It needs to be clear enough that the other person could explain what you do to someone else.'
+        },
+        {
+          text: 'I feel like I am applying below my level, just to stay in the game.',
+          interp: 'This usually happens when your actual level is not visible in how you present yourself. You are compensating for a translation gap by lowering the target, but that often makes things worse, not better. Employers see a lower-level candidate, not someone adapting.',
+          next: 'Look at your most recent application. Does it reflect what you actually bring, or a safer version of it? One specific rewrite, a cover letter, a LinkedIn summary, one job application, is enough to test whether the gap is in the presentation, not the profile.'
+        },
+        {
+          text: 'I am not sure what kind of role or direction I should be positioning myself for here.',
+          interp: 'This sits at the edge of Positioning Collapse and Priority Confusion. Without a clear direction, positioning becomes impossible. You cannot present yourself clearly if you do not know what you are presenting for. The issue is not how you are seen. It is that you have not yet decided what you want to be seen as.',
+          next: 'Before rewriting anything, pick one direction to test for the next two weeks. Apply as if that is the direction. See what comes back. Positioning clarity often comes from testing, not from thinking it through in isolation.'
+        },
+        {
+          text: 'People seem interested in me, but conversations do not go anywhere.',
+          interp: 'Interest without conversion usually points to a gap between first impression and depth. You are visible enough to get attention, but something in the follow-through does not confirm what the first impression suggested. This can be about how you explain your value in conversation, not just on paper.',
+          next: 'After your next conversation that does not progress, send a short follow-up that makes your direction and value explicit in one or two sentences. Not a pitch, just clarity. "I am specifically looking for X because Y." This removes ambiguity and often unlocks the next step.'
+        }
+      ]
+    },
+    'Execution Fragmentation': {
+      question: 'When it comes to making progress consistently, which of these feels closest?',
+      support: 'If things keep fragmenting, a short conversation can help identify what is actually breaking the loop.',
+      situations: [
+        {
+          text: 'I am doing a lot but nothing seems to compound.',
+          interp: 'When effort does not accumulate, it is usually because each action is isolated. Applying here, networking there, exploring something else over there. Without a repeatable loop connecting those actions, each week starts from zero. The problem is not the volume of effort. It is the structure around it.',
+          next: 'Define one loop for the next two weeks: one target area, one action per day, one metric to track. It does not need to be perfect. It needs to be consistent enough that this week's effort builds on last week's.'
+        },
+        {
+          text: 'I start things but have trouble following through.',
+          interp: 'Inconsistent follow-through usually points to one of two things: too many tracks running at once, or a mismatch between what you are doing and what you actually want. When direction is unclear, motivation to execute drops. When focus is scattered, completion rate drops. Both look the same from the outside.',
+          next: 'Look at the last three things you started but did not finish. Was the issue energy, direction, or competing priorities? The pattern usually reveals which one to solve first.'
+        },
+        {
+          text: 'I am not sure where to put my energy first.',
+          interp: 'This is Execution Fragmentation meeting Priority Confusion. Without a clear hierarchy, every action feels equally optional. The result is scattered effort that does not move anything forward fast enough to create visible progress.',
+          next: 'Write down everything you are currently working on. Pick the one thing that, if it moved forward this week, would make the most difference. Do that one thing first tomorrow, before anything else. Sequence matters more than volume.'
+        },
+        {
+          text: 'I am reactive, responding to things as they come instead of driving a clear direction.',
+          interp: 'A reactive mode usually develops after a long period of uncertainty. When things feel out of control, responding to what arrives feels safer than committing to a direction that might not work. But reactive effort rarely compounds. It keeps you busy without moving you forward.',
+          next: 'Before checking messages or emails tomorrow morning, write down the one thing you want to have done by the end of the day. Do that first. One proactive action before the reactive mode kicks in is enough to start shifting the pattern.'
+        },
+        {
+          text: 'I make progress for a while, then it falls apart.',
+          interp: 'Progress that cannot sustain itself usually means the system depends too much on motivation rather than structure. Good weeks happen when you feel ready. Bad weeks happen when you do not. The goal is to build a loop that runs even on the bad weeks, because those are the weeks that actually matter.',
+          next: 'Design your minimum viable week. What is the smallest set of actions that, if you did only those, would still count as forward movement? That is your floor. When things get hard, you do not skip the week. You do the floor.'
+        }
+      ]
+    },
+    'Capacity Breakdown': {
+      question: 'When it comes to keeping going, which of these feels closest?',
+      support: 'If things feel too heavy to move right now, we are happy to think through it together without pressure.',
+      situations: [
+        {
+          text: 'I am exhausted and I do not know how to recover.',
+          interp: 'When exhaustion reaches this point, the usual advice to push harder or try a new strategy usually backfires. The system is already overloaded. More input creates more friction, not more progress. Recovery at this stage is not a break from the work. It is the work.',
+          next: 'For the next three days, remove one thing from your daily list. Not permanently. Just for three days. Notice what happens to your energy. Capacity recovery starts with reduction, not addition.'
+        },
+        {
+          text: 'I know what to do, but I cannot seem to make myself do it.',
+          interp: 'This gap between knowing and doing is often a sign of depleted capacity, not lack of motivation. When the system is overloaded, executive function drops. Starting becomes harder. The tasks feel heavier than they are. This is not a discipline problem. It is a resource problem.',
+          next: 'Make the next step smaller. Not "apply for three jobs today" but "open the job board." Not "write my LinkedIn About section" but "open LinkedIn." Lowering the activation threshold is how you restart movement when capacity is low.'
+        },
+        {
+          text: 'Every setback hits harder than it used to.',
+          interp: 'When rejection or silence lands heavier than it should, it usually means the emotional buffer has been depleted. After months of pressure, the same setback hits differently. That is not weakness. It is a sign the system needs replenishment.',
+          next: 'Identify one thing outside the job search or transition that reliably gives you energy. Not rest, but something that actively restores. Schedule it this week, not as a reward, but as maintenance.'
+        },
+        {
+          text: 'I feel pressure to keep moving even though I am running on empty.',
+          interp: 'The pressure to keep going often comes from outside expectations, visa timelines, or the fear that stopping means falling behind. But continuing at low capacity usually produces lower-quality output and more mistakes. A short deliberate pause usually produces better results than sustained low-quality effort.',
+          next: 'Give yourself permission to slow down for one week. Not stop, but reduce the pace intentionally. Define what "slower but still moving" looks like for you, and do that instead of pushing through.'
+        },
+        {
+          text: 'I am not sure if I am burned out or just stuck.',
+          interp: 'The difference matters. Being stuck usually means the strategy needs adjustment. Being burned out means the system needs recovery first, before any strategy change will help. The clearest signal: if the thought of working on your situation feels heavy even on a good day, that is capacity. If it feels heavy only after a hard week, that is more likely to be strategy.',
+          next: 'Take one full day this week completely away from anything related to your transition. No applications, no LinkedIn, no planning. After that day, notice how it feels to think about it again. If it feels lighter, the issue is pace. If it still feels heavy, the issue is capacity and it needs more deliberate attention.'
+        }
+      ]
+    },
+    'low_score': {
+      question: 'Based on your answers, things seem to be in a relatively clear place. Which of these feels most accurate?',
+      support: 'If you are curious what is actually happening, we are happy to take a look together.',
+      situations: [
+        {
+          text: 'Things are genuinely going well right now.',
+          interp: 'Good. The scan is designed to surface friction, and in your case it did not find much. That is useful information in itself.',
+          next: 'The main task now is keeping the momentum. One thing that helps: write down what is working. Not to celebrate, but to make the pattern visible so you can protect it when things get harder.'
+        },
+        {
+          text: 'Something feels off, but I could not find it in the questions.',
+          interp: 'The scan covers 5 layers based on patterns we have seen across many internationals. But it does not cover everything. Sometimes the friction is more specific, more personal, or sits between layers. That is not a failure of the scan. It is just the limit of a short diagnostic.',
+          next: 'A short conversation usually reveals what the scan could not. Bring this result and describe what feels off. That is often enough to find it quickly.'
+        }
+      ]
+    }
+  };
+
+  let guidedLayerName = null;
+  let guidedSelectedIdx = null;
+
+  function startGuidedLayer() {
+    const layerName = resultData ? resultData.name : 'low_score';
+    guidedLayerName = layerName;
+    guidedSelectedIdx = null;
+
+    const data = guidedData[layerName] || guidedData['low_score'];
+
+    document.getElementById('guided-entry-block').style.display = 'none';
+    const guidedLayer = document.getElementById('guided-layer');
+    guidedLayer.style.display = 'block';
+
+    document.getElementById('guided-layer-label').textContent = layerName === 'low_score' ? 'Going deeper' : 'Going deeper: ' + layerName;
+    document.getElementById('guided-question-text').textContent = data.question;
+
+    const choicesList = document.getElementById('guided-choices-list');
+    choicesList.innerHTML = '';
+    data.situations.forEach((sit, idx) => {
+      const el = document.createElement('div');
+      el.className = 'guided-choice';
+      el.innerHTML = '<div class="guided-choice-dot"><div class="guided-choice-dot-inner"></div></div><div class="guided-choice-text">' + sit.text + '</div>';
+      el.addEventListener('click', () => {
+        choicesList.querySelectorAll('.guided-choice').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        guidedSelectedIdx = idx;
+        showGuidedResponse(layerName, idx);
+      });
+      choicesList.appendChild(el);
+    });
+
+    document.getElementById('guided-response').classList.remove('visible');
+    window.scrollTo(0, document.getElementById('guided-layer').offsetTop - 20);
+  }
+
+  function showGuidedResponse(layerName, idx) {
+    const data = guidedData[layerName];
+    const sit = data.situations[idx];
+
+    document.getElementById('guided-interp-text').textContent = sit.interp;
+    document.getElementById('guided-next-text').textContent = sit.next;
+    document.getElementById('guided-support-text').textContent = data.support;
+
+    const response = document.getElementById('guided-response');
+    response.classList.add('visible');
+    setTimeout(() => {
+      response.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+
+  function hideGuidedLayer() {
+    document.getElementById('guided-layer').style.display = 'none';
+    document.getElementById('guided-entry-block').style.display = 'block';
+    window.scrollTo(0, document.getElementById('guided-entry-block').offsetTop - 20);
+  }
+
+
+  updateProgress(0);
+</script>
+</body>
+</html>
