@@ -1,0 +1,3240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Activation Scan: Flux Forward</title>
+  <meta name="description" content="A 5-minute diagnostic for internationals in the Netherlands. Find out which layer may be getting in the way of your progress." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,600;0,700;1,700&family=Barlow+Condensed:wght@700;800&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #E8201A;
+      --red-dark: #c0180f;
+      --red-light: #fff8f7;
+      --red-mid: #fde8e7;
+      --text: #111111;
+      --text-muted: #5a5a5a;
+      --text-hint: #a8a8a8;
+      --border: rgba(0,0,0,0.06);
+      --border-strong: rgba(0,0,0,0.14);
+      --bg: #fafaf8;
+      --bg-card: #ffffff;
+      --bg-off: #f4f3f0;
+      --bg-subtle: #faf9f7;
+      --green: #0f6b37;
+      --green-light: #f0f8f3;
+      --transition: 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+      --transition-slow: 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-feature-settings: "ss01", "ss02";
+    }
+
+    ::selection { background: var(--text); color: white; }
+
+    /* ── NAV ── */
+    nav {
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(250, 250, 248, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo { text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+    .nav-logo::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      background: var(--red);
+      border-radius: 50%;
+    }
+    .logo-text {
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      color: var(--text);
+      text-transform: uppercase;
+    }
+    .nav-tag {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-hint);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 6rem 2rem 4.5rem;
+      text-align: center;
+      max-width: 760px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 2.5rem;
+      padding: 6px 14px;
+      background: var(--red-mid);
+      border-radius: 100px;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--red);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+    .hero h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.6rem, 7vw, 4.8rem);
+      line-height: 0.95;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 1.75rem;
+      letter-spacing: -0.015em;
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--red);
+      position: relative;
+    }
+    .hero-subtitle {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-hint);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+    .hero p {
+      font-size: 17px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 480px;
+      margin: 0 auto 3rem;
+      font-weight: 400;
+    }
+    .hero-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 1.5rem;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-hint);
+    }
+    .hero-meta-item { position: relative; }
+    .hero-meta-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: -0.8rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 3px;
+      background: var(--text-hint);
+      border-radius: 50%;
+      opacity: 0.5;
+    }
+
+    /* ── SCAN CONTAINER & CARD ── */
+    .scan-container {
+      max-width: 580px;
+      margin: 0 auto 8rem;
+      padding: 0 1.5rem;
+      width: 100%;
+    }
+    .scan-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2.75rem;
+      box-shadow:
+        0 1px 2px rgba(0,0,0,0.02),
+        0 8px 32px rgba(0,0,0,0.04);
+    }
+
+    /* ── PROGRESS ── */
+    .progress-track {
+      height: 2px;
+      background: var(--bg-off);
+      margin-bottom: 0.875rem;
+      overflow: hidden;
+      border-radius: 2px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--text);
+      transition: width 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+      border-radius: 2px;
+    }
+    .progress-text {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-hint);
+      margin-bottom: 2.25rem;
+    }
+
+    /* ── STEPS & ANIMATIONS ── */
+    .step { display: none; }
+    .step.active {
+      display: block;
+      animation: stepIn 0.4s cubic-bezier(0.32, 0.72, 0, 1) both;
+    }
+    @keyframes stepIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── STEP ELEMENTS ── */
+    .step-label {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 1.25rem;
+      padding: 4px 10px;
+      background: var(--red-mid);
+      border-radius: 100px;
+    }
+    .question-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 26px;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: -0.005em;
+    }
+    .question-context {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: 1.75rem;
+      font-style: normal;
+      padding: 0;
+      border: none;
+    }
+
+    /* ── CHOICES ── */
+    .choice-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 2.25rem;
+    }
+    .choice-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 16px;
+      border: 1px solid var(--border-strong);
+      border-radius: 3px;
+      cursor: pointer;
+      background: var(--bg-card);
+      user-select: none;
+      transition: all var(--transition);
+      position: relative;
+    }
+    .choice-option:hover {
+      border-color: var(--text);
+      transform: translateX(2px);
+    }
+    .choice-option.selected {
+      border-color: var(--red);
+      background: var(--red-light);
+      box-shadow: 0 0 0 3px rgba(232,32,26,0.08);
+    }
+    .choice-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-strong);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition);
+      margin-top: 1px;
+    }
+    .choice-option.selected .choice-dot {
+      background: var(--red);
+      border-color: var(--red);
+      transform: scale(1.05);
+    }
+    .choice-inner {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: white;
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .choice-option.selected .choice-inner { opacity: 1; }
+    .choice-text {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* ── PREVIEW SCREEN ── */
+    .preview-action-block { margin-bottom: 2rem; }
+    .preview-tagline {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 1.25rem;
+    }
+    .preview-stats-line {
+      font-size: 12px;
+      color: var(--text-hint);
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+      font-style: normal;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .preview-stats-line::before {
+      content: '';
+      width: 4px;
+      height: 4px;
+      background: var(--red);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .preview-reassurance {
+      font-size: 11px;
+      color: var(--text-hint);
+      text-align: center;
+      letter-spacing: 0.06em;
+      margin-top: 1rem;
+    }
+    .layer-preview-item {
+      display: flex;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      align-items: flex-start;
+    }
+    .layer-preview-item:last-child { border-bottom: none; }
+    .layer-preview-num {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--red);
+      width: 18px;
+      flex-shrink: 0;
+      padding-top: 3px;
+      letter-spacing: 0.06em;
+    }
+    .layer-preview-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+    .layer-preview-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* ── ACCORDION ── */
+    .accordion-section { border-top: 1px solid var(--border); }
+    .accordion-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: 'Barlow', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      text-align: left;
+      transition: color var(--transition);
+    }
+    .accordion-toggle:hover { color: var(--text); }
+    .accordion-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      position: relative;
+      transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .accordion-icon::before, .accordion-icon::after {
+      content: '';
+      position: absolute;
+      background: var(--text-hint);
+      transition: background var(--transition);
+    }
+    .accordion-icon::before {
+      width: 10px;
+      height: 1px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .accordion-icon::after {
+      width: 1px;
+      height: 10px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .accordion-icon.open { transform: rotate(180deg); }
+    .accordion-icon.open::after { transform: translate(-50%, -50%) scaleY(0); }
+    .accordion-icon.open::before, .accordion-toggle:hover .accordion-icon::before, .accordion-toggle:hover .accordion-icon::after { background: var(--red); }
+    .accordion-body {
+      padding: 0 0 1.25rem;
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.7;
+      animation: fadeUp 0.25s ease both;
+    }
+    .accordion-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--red);
+      text-decoration: none;
+      font-weight: 600;
+      padding: 6px 0;
+      transition: gap var(--transition);
+    }
+    .accordion-link:hover { gap: 10px; }
+
+    /* ── FORM FIELDS ── */
+    .field { margin-bottom: 1.1rem; }
+    .field label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .field input[type="text"], .field input[type="email"] {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid var(--border-strong);
+      border-radius: 3px;
+      font-size: 15px;
+      font-family: 'Barlow', sans-serif;
+      background: var(--bg-card);
+      color: var(--text);
+      outline: none;
+      transition: all var(--transition);
+    }
+    .field input:focus {
+      border-color: var(--text);
+      box-shadow: 0 0 0 3px rgba(17,17,17,0.06);
+    }
+    .gdpr-note {
+      font-size: 11px;
+      color: var(--text-hint);
+      line-height: 1.65;
+      margin-bottom: 1.5rem;
+    }
+    .gdpr-note a { color: var(--text-hint); text-decoration: underline; }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Barlow', sans-serif;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: var(--text);
+      color: white;
+      transition: background var(--transition), transform 0.1s;
+      position: relative;
+    }
+    .btn-primary span { position: relative; z-index: 1; }
+    .btn-primary:not(:disabled):hover { background: var(--red); }
+    .btn-primary:disabled { background: #d4d4d4; color: white; cursor: not-allowed; }
+    .btn-primary:not(:disabled):active { transform: scale(0.98); }
+    .btn-secondary {
+      width: 100%;
+      padding: 16px;
+      border: 1px solid var(--border-strong);
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Barlow', sans-serif;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: transparent;
+      color: var(--text);
+      transition: all var(--transition);
+    }
+    .btn-secondary:hover { background: var(--text); color: white; border-color: var(--text); }
+    .btn-secondary:active { transform: scale(0.98); }
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .btn-cta {
+      display: block;
+      width: 100%;
+      padding: 18px;
+      background: var(--red);
+      color: white;
+      border: none;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Barlow', sans-serif;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all var(--transition);
+      box-shadow: 0 1px 2px rgba(232,32,26,0.1), 0 6px 20px rgba(232,32,26,0.18);
+    }
+    .btn-cta:hover {
+      background: var(--red-dark);
+      box-shadow: 0 2px 4px rgba(232,32,26,0.15), 0 12px 32px rgba(232,32,26,0.25);
+      transform: translateY(-1px);
+    }
+    .btn-cta:active { transform: translateY(0); }
+    .btn-inline {
+      display: block;
+      width: 100%;
+      padding: 13px 16px;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border-strong);
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Barlow', sans-serif;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all var(--transition);
+      margin-bottom: 2rem;
+    }
+    .btn-inline:hover {
+      background: var(--text);
+      color: white;
+      border-color: var(--text);
+    }
+
+    /* ── RESULT ── */
+    .result-eyebrow {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 1rem;
+      padding: 4px 10px;
+      background: var(--red-mid);
+      border-radius: 100px;
+    }
+    .result-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 34px;
+      line-height: 1.05;
+      color: var(--text);
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+      letter-spacing: -0.01em;
+    }
+    .result-desc {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.75;
+      margin-bottom: 1.75rem;
+    }
+    .insight-box {
+      border: none;
+      border-left: 2px solid var(--red);
+      padding: 0.25rem 0 0.25rem 1.25rem;
+      background: transparent;
+      margin-bottom: 1.5rem;
+    }
+    .insight-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 8px;
+    }
+    .insight-text { font-size: 14px; color: var(--text); line-height: 1.75; }
+    .next-box {
+      border: none;
+      border-left: 2px solid var(--green);
+      padding: 0.25rem 0 0.25rem 1.25rem;
+      background: transparent;
+      margin-bottom: 2rem;
+    }
+    .next-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 8px;
+    }
+    .next-text { font-size: 14px; color: var(--text); line-height: 1.75; }
+
+    /* ── ALL LAYERS / BAR CHART ── */
+    .all-layers { margin-bottom: 2rem; }
+    .all-layers-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-hint);
+      margin-bottom: 1rem;
+    }
+    .layer-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .layer-row:last-child { border-bottom: none; }
+    .layer-row-name { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
+    .layer-bar-wrap {
+      width: 120px;
+      height: 4px;
+      background: var(--bg-off);
+      overflow: hidden;
+      border-radius: 100px;
+    }
+    .layer-bar-fill {
+      height: 100%;
+      background: var(--red);
+      border-radius: 100px;
+      transition: width 0.7s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .layer-bar-fill.low { background: #d4d4d4; }
+    .layer-score-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-hint);
+      width: 56px;
+      text-align: right;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── SECONDARY LAYERS ── */
+    .secondary-section { margin-bottom: 2rem; }
+    .secondary-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-hint);
+      margin-bottom: 1rem;
+    }
+    .secondary-layer {
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.5rem;
+      background: var(--bg-subtle);
+      transition: all var(--transition);
+    }
+    .secondary-layer:hover { border-color: var(--border-strong); }
+    .secondary-layer-name {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .secondary-layer-text { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+    /* ── ACCURACY BOX ── */
+    .accuracy-box {
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      background: var(--bg-subtle);
+    }
+    .accuracy-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; }
+    .accuracy-sub { font-size: 13px; color: var(--text-muted); line-height: 1.65; margin-bottom: 0.75rem; }
+    .accuracy-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--red);
+      text-decoration: none;
+      font-weight: 600;
+      transition: gap var(--transition);
+    }
+    .accuracy-link:hover { gap: 10px; }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 2rem 0;
+    }
+
+    /* ── EMAIL CAPTURE ── */
+    .email-capture {
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      background: var(--bg-subtle);
+    }
+    .email-capture-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.005em;
+    }
+    .email-capture-sub { font-size: 13px; color: var(--text-muted); line-height: 1.65; margin-bottom: 1.25rem; }
+    .email-capture-success { font-size: 14px; color: var(--green); font-weight: 600; padding: 0.75rem 0; display: none; }
+
+    /* ── CTA SECTION ── */
+    .cta-softener {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: 1.25rem;
+      font-style: normal;
+      padding: 0 0 0 1rem;
+      border-left: 2px solid var(--border-strong);
+    }
+    .cta-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 28px;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.005em;
+      line-height: 1.1;
+    }
+    .cta-sub { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 1.5rem; }
+    .minor-links { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .minor-link {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .minor-link:hover { color: var(--red); }
+    .minor-link::before { content: '→'; opacity: 0.5; }
+
+    /* ── TOOLTIP ── */
+    .tooltip-wrap { position: relative; display: inline-flex; align-items: center; gap: 5px; }
+    .tooltip-icon {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--bg-off);
+      border: 1px solid var(--border-strong);
+      color: var(--text-hint);
+      font-size: 9px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: help;
+      flex-shrink: 0;
+      transition: all var(--transition);
+    }
+    .tooltip-wrap:hover .tooltip-icon {
+      background: var(--text);
+      color: white;
+      border-color: var(--text);
+    }
+    .tooltip-popup {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--text);
+      color: white;
+      font-size: 12px;
+      line-height: 1.5;
+      padding: 10px 14px;
+      width: 220px;
+      z-index: 10;
+      pointer-events: none;
+      font-weight: 400;
+      border-radius: 4px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    }
+    .tooltip-popup::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: var(--text);
+    }
+    .tooltip-wrap:hover .tooltip-popup,
+    .tooltip-wrap:focus-within .tooltip-popup { display: block; }
+
+    /* ── GUIDED ACTIVATION LAYER ── */
+    .guided-layer { animation: stepIn 0.4s ease both; }
+    .guided-question {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: -0.005em;
+    }
+    .guided-choices { display: flex; flex-direction: column; gap: 6px; margin-bottom: 2rem; }
+    .guided-choice {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--border-strong);
+      border-radius: 3px;
+      cursor: pointer;
+      background: var(--bg-card);
+      user-select: none;
+      transition: all var(--transition);
+    }
+    .guided-choice:hover {
+      border-color: var(--text);
+      transform: translateX(2px);
+    }
+    .guided-choice.selected {
+      border-color: var(--red);
+      background: var(--red-light);
+      box-shadow: 0 0 0 3px rgba(232,32,26,0.08);
+    }
+    .guided-choice-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-strong);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition);
+      margin-top: 2px;
+    }
+    .guided-choice.selected .guided-choice-dot {
+      background: var(--red);
+      border-color: var(--red);
+      transform: scale(1.05);
+    }
+    .guided-choice-dot-inner {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: white;
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .guided-choice.selected .guided-choice-dot-inner { opacity: 1; }
+    .guided-choice-text { font-size: 14px; color: var(--text); line-height: 1.5; }
+    .guided-response { display: none; animation: stepIn 0.4s ease both; }
+    .guided-response.visible { display: block; }
+    .guided-interpretation {
+      border: none;
+      border-left: 2px solid var(--border-strong);
+      padding: 0.25rem 0 0.25rem 1.25rem;
+      background: transparent;
+      margin-bottom: 1.5rem;
+    }
+    .guided-interpretation-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-hint);
+      margin-bottom: 8px;
+    }
+    .guided-interpretation-text { font-size: 14px; color: var(--text); line-height: 1.75; }
+    .guided-next {
+      border: none;
+      border-left: 2px solid var(--green);
+      padding: 0.25rem 0 0.25rem 1.25rem;
+      background: transparent;
+      margin-bottom: 1.75rem;
+    }
+    .guided-next-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 8px;
+    }
+    .guided-next-text { font-size: 14px; color: var(--text); line-height: 1.75; }
+    .guided-support {
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1.25rem;
+      background: var(--bg-subtle);
+      margin-bottom: 1.5rem;
+    }
+    .guided-support-text { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 0.75rem; }
+    .guided-support-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--red);
+      text-decoration: none;
+      font-weight: 600;
+      transition: gap var(--transition);
+    }
+    .guided-support-link:hover { gap: 10px; }
+    .guided-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-hint);
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      margin-bottom: 1.5rem;
+      font-family: 'Barlow', sans-serif;
+      transition: color var(--transition), gap var(--transition);
+    }
+    .guided-back:hover { color: var(--red); gap: 10px; }
+    .guided-separator { height: 1px; background: var(--border); margin: 2rem 0; }
+    .guided-entry {
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1.75rem;
+      margin-top: 2rem;
+      background: var(--bg-subtle);
+    }
+    .guided-entry-label {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 0.875rem;
+      padding: 4px 10px;
+      background: var(--red-mid);
+      border-radius: 100px;
+    }
+    .guided-entry-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.005em;
+    }
+    .guided-entry-sub { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 1.5rem; }
+
+    /* ── FIELD-AGNOSTIC NOTE ── */
+    .field-agnostic-note {
+      font-size: 11px;
+      color: var(--text-hint);
+      font-style: normal;
+      margin-bottom: 1.5rem;
+      padding: 8px 12px;
+      background: var(--bg-off);
+      border-radius: 3px;
+      border-left: none;
+      display: inline-flex;
+      align-items: flex-start;
+      gap: 8px;
+      width: 100%;
+      line-height: 1.6;
+    }
+    .field-agnostic-note::before {
+      content: '✦';
+      color: var(--red);
+      flex-shrink: 0;
+    }
+
+    /* ── CHECKBOX ── */
+    .checkbox-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+    .checkbox-label input { margin-top: 2px; accent-color: var(--red); flex-shrink: 0; }
+
+
+    /* ── GDPR CONSENT CHECKBOX ── */
+    .consent-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      background: var(--bg-off);
+      border-radius: 3px;
+      border-left: 2px solid var(--border-strong);
+      margin-bottom: 1.25rem;
+      transition: border-color var(--transition);
+    }
+    .consent-row.checked { border-left-color: var(--red); background: var(--red-light); }
+    .consent-row input[type="checkbox"] {
+      margin-top: 2px;
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      accent-color: var(--red);
+      cursor: pointer;
+    }
+    .consent-row label {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.5;
+      cursor: pointer;
+      text-transform: none;
+      letter-spacing: 0;
+      font-weight: 400;
+      flex: 1;
+    }
+    .consent-row .consent-link {
+      display: inline;
+      color: var(--red);
+      text-decoration: underline;
+      font-weight: 600;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: inherit;
+      font-size: inherit;
+    }
+    .consent-row .consent-link:hover { color: var(--red-dark); }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(17,17,17,0.55);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      animation: modalFade 0.2s ease;
+    }
+    .modal-overlay.visible { display: flex; }
+    @keyframes modalFade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .modal-content {
+      background: var(--bg-card);
+      max-width: 540px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      border-radius: 4px;
+      padding: 2rem;
+      position: relative;
+      animation: modalSlide 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+      box-shadow: 0 24px 48px rgba(0,0,0,0.18);
+    }
+    @keyframes modalSlide {
+      from { opacity: 0; transform: translateY(20px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 32px;
+      height: 32px;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      font-size: 18px;
+      color: var(--text-hint);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition);
+      line-height: 1;
+    }
+    .modal-close:hover { color: var(--text); border-color: var(--text); }
+    .modal-eyebrow {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 0.875rem;
+      padding: 4px 10px;
+      background: var(--red-mid);
+      border-radius: 100px;
+    }
+    .modal-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 26px;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 1rem;
+      line-height: 1.1;
+      letter-spacing: -0.005em;
+    }
+    .modal-section { margin-bottom: 1.25rem; }
+    .modal-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    .modal-section-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .modal-section-text a { color: var(--red); text-decoration: underline; font-weight: 600; }
+    .modal-divider { height: 1px; background: var(--border); margin: 1.25rem 0; }
+    .modal-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    .modal-actions .btn-primary { flex: 1; }
+
+
+    /* ── COOKIE BANNER ── */
+    .cookie-banner {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--text);
+      color: white;
+      padding: 1.25rem 1.5rem;
+      z-index: 999;
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.15);
+      animation: bannerSlide 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .cookie-banner.visible { display: block; }
+    @keyframes bannerSlide {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .cookie-banner-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .cookie-banner-text {
+      font-size: 13px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.9);
+      flex: 1;
+      min-width: 240px;
+    }
+    .cookie-banner-text strong {
+      color: white;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 3px;
+      font-size: 13px;
+      letter-spacing: 0.02em;
+    }
+    .cookie-banner-text a {
+      color: white;
+      text-decoration: underline;
+      font-weight: 600;
+    }
+    .cookie-banner-actions {
+      display: flex;
+      gap: 0.625rem;
+      flex-shrink: 0;
+    }
+    .cookie-btn {
+      padding: 10px 20px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Barlow', sans-serif;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all var(--transition);
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .cookie-btn-reject {
+      background: transparent;
+      color: rgba(255,255,255,0.85);
+      border-color: rgba(255,255,255,0.25);
+    }
+    .cookie-btn-reject:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.5);
+      color: white;
+    }
+    .cookie-btn-accept {
+      background: var(--red);
+      color: white;
+      border-color: var(--red);
+    }
+    .cookie-btn-accept:hover {
+      background: var(--red-dark);
+      border-color: var(--red-dark);
+    }
+    @media (max-width: 600px) {
+      .cookie-banner { padding: 1rem 1.25rem; }
+      .cookie-banner-inner { gap: 1rem; }
+      .cookie-banner-text { min-width: 100%; }
+      .cookie-banner-actions { width: 100%; }
+      .cookie-btn { flex: 1; padding: 12px; }
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      margin-top: auto;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-hint);
+      border-top: 1px solid var(--border);
+    }
+    footer a { color: var(--text-hint); text-decoration: none; transition: color var(--transition); }
+    footer a:hover { color: var(--red); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      nav { padding: 1rem 1.25rem; }
+      .scan-card { padding: 1.75rem 1.25rem; }
+      .hero { padding: 4rem 1.5rem 3rem; }
+      .hero-meta { flex-wrap: wrap; gap: 1rem; }
+      .hero-meta-item:not(:last-child)::after { display: none; }
+      .btn-row { grid-template-columns: 1fr; }
+      .layer-bar-wrap { width: 80px; }
+      .question-text { font-size: 22px; }
+      .result-title { font-size: 27px; }
+      .cta-title { font-size: 24px; }
+    }
+    /* PRODUCT UI PASS */
+    body {
+      background:
+        linear-gradient(135deg, rgba(232,32,26,0.07), transparent 28rem),
+        radial-gradient(circle at top right, rgba(15,107,55,0.08), transparent 24rem),
+        var(--bg);
+    }
+    nav {
+      padding: 1rem 2rem;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.75) inset;
+    }
+    .nav-actions { display: flex; align-items: center; gap: 1rem; }
+    .nav-link {
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color var(--transition);
+    }
+    .nav-link:hover { color: var(--red); }
+    .product-shell {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 4rem 0 6rem;
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(460px, 1.05fr);
+      gap: 3rem;
+      align-items: start;
+    }
+    .hero {
+      max-width: none;
+      margin: 0;
+      padding: 2.25rem 0 0;
+      text-align: left;
+      position: sticky;
+      top: 5.25rem;
+    }
+    .hero-badge { margin-bottom: 1.6rem; border-radius: 4px; }
+    .hero h1 {
+      font-size: clamp(3.4rem, 7vw, 6.6rem);
+      line-height: 0.88;
+      max-width: 560px;
+      margin-bottom: 1.25rem;
+      letter-spacing: 0;
+    }
+    .hero-subtitle {
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.5;
+      letter-spacing: 0.08em;
+      max-width: 520px;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      margin: 0 0 1.75rem;
+      max-width: 520px;
+      font-size: 18px;
+    }
+    .hero-meta {
+      display: flex;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .hero-panel {
+      max-width: 520px;
+      background: rgba(255,255,255,0.74);
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 22px 70px rgba(0,0,0,0.08);
+      backdrop-filter: blur(18px);
+    }
+    .hero-panel-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1rem;
+    }
+    .hero-panel-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+    .hero-panel-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .hero-panel-status::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+    .signal-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      align-items: end;
+      height: 120px;
+      margin-bottom: 1rem;
+    }
+    .signal-bar {
+      border-radius: 5px 5px 2px 2px;
+      background: linear-gradient(180deg, var(--red), #111);
+      min-height: 22px;
+      opacity: 0.9;
+    }
+    .signal-bar:nth-child(1) { height: 45%; opacity: 0.55; }
+    .signal-bar:nth-child(2) { height: 78%; }
+    .signal-bar:nth-child(3) { height: 55%; opacity: 0.68; }
+    .signal-bar:nth-child(4) { height: 36%; opacity: 0.5; }
+    .signal-bar:nth-child(5) { height: 64%; opacity: 0.78; }
+    .hero-panel-copy {
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .scan-container {
+      max-width: none;
+      margin: 0;
+      padding: 0;
+    }
+    .scan-card {
+      border-radius: 8px;
+      padding: 0;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(17,17,17,0.12);
+    }
+    .scan-header {
+      padding: 1.35rem 1.5rem 1.25rem;
+      background: var(--text);
+      color: white;
+    }
+    .scan-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .scan-kicker {
+      color: rgba(255,255,255,0.62);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    .scan-time {
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 999px;
+      color: rgba(255,255,255,0.82);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      padding: 6px 10px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .progress-track { background: rgba(255,255,255,0.14); margin-bottom: 0.8rem; }
+    .progress-fill { background: var(--red); }
+    .progress-text { color: rgba(255,255,255,0.62); margin-bottom: 0; }
+    .progress-steps {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      margin-top: 1rem;
+    }
+    .progress-dot {
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.16);
+      transition: background var(--transition), transform var(--transition);
+    }
+    .progress-dot.active { background: var(--red); transform: scaleY(1.35); }
+    .scan-body { padding: 2.4rem; }
+    .question-text, .result-title, .cta-title, .email-capture-title, .guided-question { letter-spacing: 0; }
+    .question-text { font-size: 30px; line-height: 1.08; max-width: 760px; }
+    .question-context, .preview-tagline { font-size: 15px; }
+    .field-agnostic-note {
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg-subtle);
+      padding: 12px 14px;
+      margin-bottom: 1.4rem;
+    }
+    .choice-wrap { gap: 10px; }
+    .choice-option {
+      border-radius: 7px;
+      padding: 16px;
+      background: linear-gradient(180deg, #fff, #fbfbf9);
+    }
+    .choice-option:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(17,17,17,0.06); }
+    .choice-option.selected { box-shadow: 0 0 0 3px rgba(232,32,26,0.09), 0 10px 24px rgba(232,32,26,0.08); }
+    .btn-primary, .btn-secondary, .btn-cta, .btn-inline, .cookie-btn { border-radius: 6px; }
+    .btn-primary, .btn-cta { min-height: 50px; }
+    .step-label, .result-eyebrow, .hero-badge { border-radius: 5px; }
+    .preview-card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 1.5rem 0;
+    }
+    .preview-card {
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 1rem;
+      background: var(--bg-subtle);
+    }
+    .preview-card-value {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--red);
+      margin-bottom: 6px;
+    }
+    .preview-card-label {
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      line-height: 1.35;
+      text-transform: uppercase;
+    }
+    .result-title { font-size: 42px; }
+    .result-hero {
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--text), #302423);
+      color: white;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .result-hero .result-eyebrow { background: rgba(255,255,255,0.12); color: #fff; }
+    .result-hero .result-title, .result-hero .result-desc { color: white; }
+    .result-hero .result-desc { color: rgba(255,255,255,0.78); margin-bottom: 0; }
+    .insight-box, .next-box, .accuracy-box, .email-capture, .guided-entry, .secondary-layer {
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+    }
+    .insight-box { border-left: 4px solid var(--red); }
+    .next-box { border-left: 4px solid var(--green); }
+    .all-layers {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      background: var(--bg-subtle);
+    }
+    .layer-row.primary {
+      background: var(--red-light);
+      margin-inline: -0.55rem;
+      padding-inline: 0.55rem;
+      border-radius: 6px;
+    }
+    .layer-bar-wrap { height: 7px; width: 150px; }
+    .email-capture, .guided-entry { background: var(--bg-subtle); }
+    .minor-links {
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+    }
+    @media (max-width: 980px) {
+      .product-shell {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding-top: 2.5rem;
+      }
+      .hero {
+        position: static;
+        padding-top: 0;
+      }
+      .hero h1 { max-width: 720px; }
+      .hero p, .hero-subtitle, .hero-panel { max-width: 680px; }
+    }
+    @media (max-width: 600px) {
+      .nav-tag, .nav-link { display: none; }
+      .nav-actions { gap: 0.75rem; }
+      .product-shell { width: min(100% - 24px, 1180px); padding: 2rem 0 4rem; }
+      .scan-card { padding: 0; }
+      .scan-body { padding: 1.5rem 1.15rem; }
+      .scan-header { padding: 1.2rem 1.15rem; }
+      .scan-header-row { align-items: flex-start; }
+      .hero { padding: 0; }
+      .hero h1 { font-size: clamp(3rem, 19vw, 4.5rem); }
+      .hero p { font-size: 16px; }
+      .hero-panel { display: none; }
+      .preview-card-grid { grid-template-columns: 1fr; }
+      .layer-row { align-items: flex-start; flex-wrap: wrap; }
+      .layer-row-name { flex-basis: 100%; }
+      .layer-bar-wrap { width: calc(100% - 68px); }
+    }
+    /* APP ALIGNMENT PASS */
+    :root {
+      --bg: #f4f4f2;
+      --panel: #ffffff;
+      --soft: #e3e3df;
+      --black: #080808;
+      --muted: #6b6b6b;
+      --radius: 26px;
+      --border: var(--soft);
+      --border-strong: #c9c9c4;
+      --bg-card: var(--panel);
+      --bg-off: #f7f7f5;
+      --bg-subtle: #f7f7f5;
+      --text-muted: var(--muted);
+      --text-hint: #8c8c8c;
+    }
+    html { scroll-padding-top: 22px; }
+    body {
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      padding: 22px;
+      display: block;
+      --app-frame-width: min(1220px, calc(100vw - 44px));
+      --app-frame-left: calc((100vw - var(--app-frame-width)) / 2);
+    }
+    nav {
+      position: fixed;
+      left: var(--app-frame-left);
+      top: 22px;
+      bottom: 22px;
+      width: 230px;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 24px;
+      padding: 24px;
+      background: var(--black);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      box-shadow: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .brand-block { display: block; }
+    .nav-logo {
+      display: block;
+      margin-bottom: 24px;
+    }
+    .nav-logo::before { display: none; }
+    .brand-logo {
+      width: 100%;
+      max-width: 180px;
+      height: auto;
+      display: block;
+    }
+    .sidebar-copy {
+      color: #bdbdbd;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .nav-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: stretch;
+      flex: 1;
+    }
+    .nav-link,
+    .nav-tag {
+      display: block;
+      text-decoration: none;
+      color: #e8e8e8;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    .nav-link.primary {
+      background: var(--red);
+      border-color: var(--red);
+      color: white;
+    }
+    .nav-link:hover {
+      color: white;
+      background: rgba(255,255,255,0.11);
+    }
+    .nav-link.primary:hover { background: var(--red-dark); }
+    .nav-tag {
+      color: #8c8c8c;
+      background: transparent;
+      border: none;
+      padding: 14px 0 0;
+      margin-top: auto;
+      font-size: 12px;
+    }
+    .product-shell {
+      width: min(968px, calc(100vw - 318px));
+      margin: 0 0 0 calc(var(--app-frame-left) + 230px);
+      padding: 0 0 30px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 22px;
+    }
+    .scan-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 22px;
+    }
+    .scan-topbar h1 {
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      font-size: clamp(34px, 5vw, 64px);
+      line-height: 0.95;
+      letter-spacing: -0.07em;
+      margin: 0;
+      text-transform: none;
+    }
+    .scan-toplinks {
+      display: flex;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+    .scan-toplinks a {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .scan-toplinks a:hover { color: var(--red); }
+    .hero {
+      position: static;
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 22px;
+      padding: 0;
+      background: transparent;
+    }
+    .hero-copy {
+      background: var(--black);
+      border-radius: var(--radius);
+      padding: 34px;
+      min-height: 260px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .hero-copy .hero-badge {
+      background: transparent;
+      color: var(--red);
+      border-radius: 0;
+      margin: 0 0 18px;
+      padding: 0;
+      width: fit-content;
+      letter-spacing: 0.12em;
+    }
+    .hero-copy .hero-badge::before { display: none; }
+    .hero-copy h1 {
+      display: none;
+    }
+    .hero-copy h1 em {
+      color: white;
+      font-style: normal;
+    }
+    .hero-copy .hero-subtitle {
+      color: #d0d0d0;
+      font-size: 17px;
+      font-weight: 400;
+      letter-spacing: 0;
+      line-height: 1.5;
+      text-transform: none;
+      margin: 0 0 12px;
+      padding: 0;
+      max-width: 560px;
+      background: transparent;
+    }
+    .hero-copy p {
+      color: #d0d0d0;
+      font-size: 15px;
+      line-height: 1.55;
+      margin: 0;
+      padding: 0;
+      max-width: 560px;
+      background: transparent;
+    }
+    .hero-copy .hero-meta {
+      justify-content: flex-start;
+      gap: 10px;
+      margin: 26px 0 0;
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
+    }
+    .hero > .hero-badge,
+    .hero > h1,
+    .hero > .hero-subtitle,
+    .hero > p,
+    .hero > .hero-meta {
+      grid-column: 1;
+      background: var(--black);
+    }
+    .hero > .hero-badge {
+      align-self: start;
+      width: fit-content;
+      color: var(--red);
+      margin: 0 34px -18px;
+      padding: 34px 0 0;
+      border-radius: 0;
+      letter-spacing: 0.12em;
+    }
+    .hero > .hero-badge::before { display: none; }
+    .hero > h1 {
+      color: white;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      font-size: clamp(38px, 6vw, 64px);
+      line-height: 0.95;
+      letter-spacing: -0.07em;
+      text-transform: none;
+      max-width: none;
+      margin: 0;
+      padding: 54px 34px 14px;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .hero h1 em {
+      color: white;
+      font-style: normal;
+    }
+    .hero > .hero-subtitle {
+      color: #d0d0d0;
+      font-size: 17px;
+      font-weight: 400;
+      letter-spacing: 0;
+      line-height: 1.5;
+      text-transform: none;
+      margin: 0;
+      padding: 0 34px 12px;
+      max-width: none;
+    }
+    .hero > p {
+      color: #d0d0d0;
+      font-size: 15px;
+      line-height: 1.55;
+      margin: 0;
+      padding: 0 34px 0;
+      max-width: none;
+    }
+    .hero > .hero-meta {
+      justify-content: flex-start;
+      gap: 10px;
+      margin: 0;
+      padding: 26px 34px 34px;
+      border-radius: 0 0 var(--radius) var(--radius);
+    }
+    .hero-meta-item {
+      color: #e6e6e6;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    .hero-meta-item:not(:last-child)::after { display: none; }
+    .hero-panel {
+      grid-column: 2;
+      grid-row: auto;
+      align-self: start;
+      max-width: none;
+      min-height: 0;
+      height: auto;
+      background: var(--panel);
+      border: 1px solid var(--soft);
+      border-radius: var(--radius);
+      padding: 26px 28px;
+      box-shadow: none;
+      backdrop-filter: none;
+    }
+    .hero-panel-top {
+      display: block;
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 24px;
+    }
+    .hero-panel-title {
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      margin-bottom: 10px;
+    }
+    .hero-panel-status {
+      color: var(--text);
+      font-size: 30px;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      text-transform: none;
+      font-weight: 900;
+      display: block;
+    }
+    .hero-panel-status::before { display: none; }
+    .hero-panel-status::after { content: 'Activation Scan'; }
+    .hero-panel-status { font-size: 0; }
+    .hero-panel-status::after { font-size: 28px; }
+    .signal-grid { height: 64px; gap: 7px; margin: 18px 0 16px; }
+    .signal-bar { border-radius: 999px 999px 6px 6px; background: var(--red); }
+    .hero-panel-copy {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .scan-card {
+      border: 1px solid var(--soft);
+      border-radius: var(--radius);
+      box-shadow: 0 20px 70px rgba(0,0,0,0.035);
+      background: var(--panel);
+    }
+    .scan-header {
+      background: var(--panel);
+      color: var(--text);
+      border-bottom: 1px solid var(--soft);
+      padding: 22px;
+    }
+    .scan-header-row { margin-bottom: 16px; }
+    .scan-kicker {
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+    }
+    .scan-time {
+      color: var(--red);
+      background: #f3f3f0;
+      border: 1px solid var(--soft);
+      font-weight: 900;
+      border-radius: 999px;
+    }
+    .progress-track {
+      height: 8px;
+      background: #f3f3f0;
+      border-radius: 999px;
+    }
+    .progress-fill { background: var(--red); border-radius: 999px; }
+    .progress-text {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    .progress-dot { height: 7px; background: #ededeb; }
+    .progress-dot.active { background: var(--red); transform: none; }
+    .scan-body { padding: 28px; }
+    .step-label,
+    .result-eyebrow,
+    .guided-entry-label,
+    .guided-interpretation-label,
+    .guided-next-label,
+    .insight-label,
+    .next-label,
+    .all-layers-title,
+    .secondary-title,
+    .field label,
+    .accuracy-title {
+      color: var(--red);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+    }
+    .step-label,
+    .result-eyebrow {
+      background: #f3f3f0;
+      border: 1px solid var(--soft);
+      border-radius: 999px;
+      padding: 7px 10px;
+    }
+    .question-text,
+    .result-title,
+    .cta-title,
+    .email-capture-title,
+    .guided-question {
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      letter-spacing: -0.05em;
+      text-transform: none;
+      line-height: 1;
+      font-weight: 900;
+    }
+    .question-text { font-size: clamp(28px, 4vw, 42px); }
+    .question-context,
+    .preview-tagline,
+    .choice-text,
+    .guided-entry-sub,
+    .email-capture-sub,
+    .result-desc,
+    .insight-text,
+    .next-text {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .field-agnostic-note,
+    .preview-card,
+    .secondary-layer,
+    .accuracy-box,
+    .email-capture,
+    .guided-entry,
+    .all-layers,
+    .insight-box,
+    .next-box {
+      border-color: var(--soft);
+      background: #f7f7f5;
+      border-radius: 18px;
+    }
+    .accordion-section {
+      border: 1px solid var(--soft);
+      border-radius: 18px;
+      background: #f7f7f5;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .accordion-toggle {
+      min-height: 64px;
+      padding: 0 18px;
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    .accordion-toggle span:first-child {
+      line-height: 1.2;
+    }
+    .accordion-icon {
+      width: 22px;
+      height: 22px;
+      color: transparent;
+      font-size: 0;
+    }
+    .accordion-icon::before,
+    .accordion-icon::after {
+      background: var(--muted);
+    }
+    .accordion-icon.open::before,
+    .accordion-toggle:hover .accordion-icon::before,
+    .accordion-toggle:hover .accordion-icon::after {
+      background: var(--red);
+    }
+    .accordion-body {
+      padding: 0 18px 18px;
+      border-top: 1px solid var(--soft);
+      background: #fff;
+    }
+    .preview-card-grid { gap: 14px; }
+    .preview-card { padding: 18px; }
+    .preview-card-value {
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      color: var(--red);
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+    }
+    .preview-card-label {
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .choice-option,
+    .guided-choice {
+      border-color: var(--soft);
+      border-radius: 18px;
+      background: #f7f7f5;
+      padding: 18px;
+    }
+    .choice-option:hover,
+    .guided-choice:hover {
+      border-color: var(--red);
+      box-shadow: none;
+      transform: translateY(-1px);
+    }
+    .choice-option.selected,
+    .guided-choice.selected {
+      background: #fff8f7;
+      border-color: var(--red);
+      box-shadow: none;
+    }
+    .choice-dot,
+    .guided-choice-dot { border-color: #c9c9c4; }
+    .choice-option.selected .choice-dot,
+    .guided-choice.selected .guided-choice-dot { background: var(--red); border-color: var(--red); }
+    .btn-primary,
+    .btn-secondary,
+    .btn-cta,
+    .btn-inline,
+    .cookie-btn,
+    .guided-support-link,
+    .accordion-link,
+    .accuracy-link {
+      border-radius: 999px;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    .btn-primary,
+    .btn-cta {
+      background: var(--red);
+      color: white;
+      box-shadow: none;
+    }
+    .btn-primary:not(:disabled):hover,
+    .btn-cta:hover {
+      background: var(--red-dark);
+      box-shadow: none;
+    }
+    .btn-secondary,
+    .btn-inline {
+      background: #f7f7f5;
+      border-color: var(--soft);
+    }
+    .result-hero {
+      background: var(--black);
+      border-radius: var(--radius);
+      padding: 34px;
+    }
+    .result-title { font-size: clamp(34px, 5vw, 56px); }
+    .result-hero .result-eyebrow {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.1);
+      color: var(--red);
+    }
+    .result-hero .result-desc { color: #d0d0d0; }
+    .insight-box { border-left: 0; }
+    .next-box {
+      border-left: 0;
+      background: var(--black);
+    }
+    .next-box .next-label { color: var(--red); }
+    .next-box .next-text { color: #e6e6e6; }
+    .layer-row.primary {
+      background: #fff8f7;
+      border: 1px solid #f1c8c5;
+    }
+    .layer-bar-wrap { background: #e7e7e4; }
+    .layer-bar-fill { background: var(--red); }
+    .cta-softener {
+      border-left: 0;
+      background: #f7f7f5;
+      border: 1px solid var(--soft);
+      border-radius: 18px;
+      padding: 18px;
+    }
+    footer {
+      margin: 22px 0 0 calc(var(--app-frame-left) + 230px);
+      width: min(968px, calc(100vw - 318px));
+      border-top: none;
+      padding: 10px 2px 30px;
+      text-align: left;
+      letter-spacing: 0;
+      text-transform: none;
+      font-weight: 400;
+      font-size: 12px;
+    }
+    .cookie-banner {
+      left: 274px;
+      right: 22px;
+      bottom: 22px;
+      border-radius: 22px;
+      background: var(--black);
+    }
+    .modal-content { border-radius: var(--radius); }
+    @media(max-width: 980px) {
+      body { padding: 14px; }
+      nav {
+        position: relative;
+        left: auto;
+        top: auto;
+        bottom: auto;
+        width: auto;
+        min-height: auto;
+        margin-bottom: 22px;
+      }
+      .nav-actions {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .nav-tag { display: none; }
+      .product-shell,
+      footer {
+        width: 100%;
+        margin-left: 0;
+      }
+      .hero { grid-template-columns: 1fr; }
+      .hero-panel {
+        grid-column: 1;
+        grid-row: auto;
+      }
+      .cookie-banner { left: 14px; right: 14px; bottom: 14px; }
+    }
+    @media(max-width: 620px) {
+      nav { padding: 20px; border-radius: 22px; }
+      .brand-logo { max-width: 180px; }
+      .sidebar-copy { margin-bottom: 18px; }
+      .nav-actions { grid-template-columns: 1fr; }
+      .nav-link { display: block; }
+      .scan-topbar {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .scan-toplinks { flex-wrap: wrap; }
+      .hero-copy { padding: 24px; border-radius: 22px; min-height: auto; }
+      .hero-copy h1 { font-size: 42px; }
+      .hero-copy .hero-meta { gap: 8px; }
+      .hero-panel { display: block; border-radius: 22px; }
+      .hero > h1 {
+        font-size: 42px;
+        padding: 50px 24px 14px;
+      }
+      .hero > .hero-badge { margin-inline: 24px; padding-top: 28px; }
+      .hero > .hero-subtitle,
+      .hero > p { padding-inline: 24px; }
+      .hero > .hero-meta { padding: 24px; }
+      .scan-header,
+      .scan-body,
+      .hero-panel,
+      .result-hero { padding: 22px; }
+      .preview-card-grid { grid-template-columns: 1fr; }
+      .btn-row { grid-template-columns: 1fr; }
+      .cookie-banner-inner { display: grid; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="brand-block">
+    <a href="https://app.fluxforward.world" class="nav-logo">
+      <img src="logo.png" alt="Flux Forward" class="brand-logo" />
+    </a>
+    <p class="sidebar-copy">Focused diagnostic module from your Flux Forward activation base.</p>
+  </div>
+  <div class="nav-actions">
+    <a class="nav-link primary" href="#scan">Start Scan</a>
+    <a class="nav-link" href="https://app.fluxforward.world">Back to App</a>
+    <a class="nav-link" href="https://blog.fluxforward.world/p/youre-not-stuck-youre-misdiagnosed" target="_blank" rel="noopener">Framework</a>
+    <span class="nav-tag">Activation Scan</span>
+  </div>
+</nav>
+
+<main class="product-shell">
+<div class="scan-topbar">
+  <h1>Activation Scan</h1>
+  <div class="scan-toplinks">
+    <a href="https://app.fluxforward.world">Back to App</a>
+    <a href="https://blog.fluxforward.world/p/youre-not-stuck-youre-misdiagnosed" target="_blank" rel="noopener">Framework</a>
+  </div>
+</div>
+<div class="hero">
+  <div class="hero-copy">
+  <div class="hero-badge">Free diagnostic</div>
+  <h1>Activation Scan</h1>
+  <p class="hero-subtitle">A short diagnostic for internationals who are putting in effort, but not getting clear results yet.</p>
+  <p>Answer five focused questions, see which layer may be slowing you down, and leave with one practical next step.</p>
+  <div class="hero-meta">
+    <span class="hero-meta-item">5 questions</span>
+    <span class="hero-meta-item">5 minutes</span>
+    <span class="hero-meta-item">No signup needed</span>
+  </div>
+  </div>
+  <div class="hero-panel" aria-hidden="true">
+    <div class="hero-panel-top">
+      <div class="hero-panel-title">Activation profile</div>
+      <div class="hero-panel-status">Live scan</div>
+    </div>
+    <div class="signal-grid">
+      <div class="signal-bar"></div>
+      <div class="signal-bar"></div>
+      <div class="signal-bar"></div>
+      <div class="signal-bar"></div>
+      <div class="signal-bar"></div>
+    </div>
+    <div class="hero-panel-copy">The scan compares five common friction layers and turns the strongest signal into a practical next step.</div>
+  </div>
+</div>
+
+<div class="scan-container" id="scan">
+  <div class="scan-card">
+    <div class="scan-header">
+      <div class="scan-header-row">
+        <div class="scan-kicker">Diagnostic workspace</div>
+        <div class="scan-time">5 min</div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+      <div class="progress-text" id="progress-text"></div>
+      <div class="progress-steps" aria-hidden="true">
+        <span class="progress-dot active"></span>
+        <span class="progress-dot"></span>
+        <span class="progress-dot"></span>
+        <span class="progress-dot"></span>
+        <span class="progress-dot"></span>
+        <span class="progress-dot"></span>
+      </div>
+    </div>
+    <div class="scan-body">
+
+    <!-- STEP 0: PREVIEW V2.8 -->
+    <div class="step active" id="step-0">
+      <div class="preview-action-block">
+        <div class="step-label">Free diagnostic</div>
+        <div class="question-text">Are you trying hard but things still aren't moving?</div>
+        <p class="preview-tagline">Answer 5 quick questions. You'll see which of 5 areas may be getting in the way, and get one clear next step. It works for any job, field, or background.</p>
+        <div class="preview-stats-line">Over 200 people in NL have tried this. Most recognised their result straight away.</div>
+        <div class="preview-card-grid">
+          <div class="preview-card">
+            <div class="preview-card-value">5</div>
+            <div class="preview-card-label">friction layers</div>
+          </div>
+          <div class="preview-card">
+            <div class="preview-card-value">1</div>
+            <div class="preview-card-label">primary signal</div>
+          </div>
+          <div class="preview-card">
+            <div class="preview-card-value">0</div>
+            <div class="preview-card-label">account required</div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="goNext(0)" style="margin-bottom:1rem;">Start the scan, no signup needed &rarr;</button>
+        <div class="preview-reassurance">Takes 5 minutes. Free. No account required.</div>
+      </div>
+
+      <div class="accordion-section">
+        <button class="accordion-toggle" onclick="toggleAccordion('acc-for')">
+          <span>Who this is for</span>
+          <span class="accordion-icon" id="acc-for-icon">+</span>
+        </button>
+        <div class="accordion-body" id="acc-for" style="display:none;">
+          <p>People who moved to the Netherlands and are still figuring things out: looking for work, switching direction, or trying to understand how things work here. It doesn't matter what field you're in or how long you've been here.</p>
+          <p style="margin-top:0.75rem;color:var(--text-hint);font-size:13px;">If things are already going well for you, this probably won't tell you much. But if something feels off or unclear, it usually shows up here.</p>
+        </div>
+      </div>
+
+      <div class="accordion-section">
+        <button class="accordion-toggle" onclick="toggleAccordion('acc-layers')">
+          <span>The 5 layers this covers</span>
+          <span class="accordion-icon" id="acc-layers-icon">+</span>
+        </button>
+        <div class="accordion-body" id="acc-layers" style="display:none;">
+          <div class="layer-preview-item"><div class="layer-preview-num">1</div><div><div class="layer-preview-name">Priority Confusion</div><div class="layer-preview-desc">You have too many options and can't decide which one to go with.</div></div></div>
+          <div class="layer-preview-item"><div class="layer-preview-num">2</div><div><div class="layer-preview-name">System Blindness</div><div class="layer-preview-desc">You're not sure how things really work here, so you end up in the most obvious places, which are often not the most useful.</div></div></div>
+          <div class="layer-preview-item"><div class="layer-preview-num">3</div><div><div class="layer-preview-name">Positioning Collapse</div><div class="layer-preview-desc">People don't seem to understand what you bring, even though your background is strong.</div></div></div>
+          <div class="layer-preview-item"><div class="layer-preview-num">4</div><div><div class="layer-preview-name">Execution Fragmentation</div><div class="layer-preview-desc">You're doing a lot, but nothing is really moving forward. Each week feels like starting over.</div></div></div>
+          <div class="layer-preview-item" style="border-bottom:none;"><div class="layer-preview-num">5</div><div><div class="layer-preview-name">Capacity Breakdown</div><div class="layer-preview-desc">You've been at this for a while and you're running low. Trying harder isn't helping anymore.</div></div></div>
+        </div>
+      </div>
+
+      <div class="accordion-section">
+        <button class="accordion-toggle" onclick="toggleAccordion('acc-get')">
+          <span>What you will get</span>
+          <span class="accordion-icon" id="acc-get-icon">+</span>
+        </button>
+        <div class="accordion-body" id="acc-get" style="display:none;">
+          <ul style="padding-left:1.1rem;color:var(--text-muted);font-size:14px;line-height:2;">
+            <li>Your primary layer with a full explanation</li>
+            <li>A visual picture of all 5 layers</li>
+            <li>A guided step to find your specific situation</li>
+            <li>One concrete next step</li>
+            <li>Option to save your result by email</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="accordion-section">
+        <button class="accordion-toggle" onclick="toggleAccordion('acc-read')">
+          <span>Read the framework first</span>
+          <span class="accordion-icon" id="acc-read-icon">+</span>
+        </button>
+        <div class="accordion-body" id="acc-read" style="display:none;">
+          <a href="https://blog.fluxforward.world/p/youre-not-stuck-youre-misdiagnosed" target="_blank" rel="noopener" class="accordion-link">You are not stuck. You are misdiagnosed. →</a>
+          <a href="https://blog.fluxforward.world/p/how-activation-actually-happens" target="_blank" rel="noopener" class="accordion-link">How activation actually happens. →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 1: Priority Confusion -->
+    <div class="step" id="step-1">
+      <div class="step-label">Question 1 of 5</div>
+      <div class="question-text">In the past two weeks, how many different directions have you actively been pursuing at the same time?</div>
+      <div class="question-context">A lot of people arrive here with a plan, then find things look different in practice. It's easy to end up chasing several directions at once without really committing to any of them.</div>
+      <div class="field-agnostic-note">These questions work for any field and any background. There are no right or wrong answers, just pick the one that feels most true.</div>
+      <div class="choice-wrap" id="choices-1"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(1)">← Back</button>
+        <button class="btn-primary" id="btn-1" onclick="goNext(1)" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: System Blindness -->
+    <div class="step" id="step-2">
+      <div class="step-label">Question 2 of 5</div>
+      <div class="question-text">When you think about your last 5 opportunities or conversations. How did most of them come about?</div>
+      <div class="question-context">There's the obvious way to find work here, and then there's how things actually move. Most people start with job boards and LinkedIn. But a lot of real opportunities happen through people, before anything gets posted.</div>
+      <div class="field-agnostic-note">These questions work for any field and any background. There are no right or wrong answers, just pick the one that feels most true.</div>
+      <div class="choice-wrap" id="choices-2"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(2)">← Back</button>
+        <button class="btn-primary" id="btn-2" onclick="goNext(2)" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Positioning Collapse -->
+    <div class="step" id="step-3">
+      <div class="step-label">Question 3 of 5</div>
+      <div class="question-text">When someone asks what you do or what you're looking for here. What usually happens?</div>
+      <div class="question-context">What made you stand out in your previous country doesn't always come across the same way here. It's not about your skills. It's about whether the people you talk to can quickly understand what you bring.</div>
+      <div class="field-agnostic-note">These questions work for any field and any background. There are no right or wrong answers, just pick the one that feels most true.</div>
+      <div class="choice-wrap" id="choices-3"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(3)">← Back</button>
+        <button class="btn-primary" id="btn-3" onclick="goNext(3)" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Execution Fragmentation -->
+    <div class="step" id="step-4">
+      <div class="step-label">Question 4 of 5</div>
+      <div class="question-text">Looking at last week. Which of these best describes how you spent your energy?</div>
+      <div class="question-context">Being busy and moving forward are not the same thing. If your effort is scattered across too many things, nothing really builds. This question looks at whether your energy is focused enough to create real momentum.</div>
+      <div class="field-agnostic-note">These questions work for any field and any background. There are no right or wrong answers, just pick the one that feels most true.</div>
+      <div class="choice-wrap" id="choices-4"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(4)">← Back</button>
+        <button class="btn-primary" id="btn-4" onclick="goNext(4)" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Capacity Breakdown -->
+    <div class="step" id="step-5">
+      <div class="step-label">Question 5 of 5</div>
+      <div class="question-text">When you think about the next step you know you should take. What gets in the way most often?</div>
+      <div class="question-context">Long transitions are tiring. After months of uncertainty and pressure, your energy and motivation quietly drop. At some point, pushing harder stops working and can actually make things worse.</div>
+      <div class="field-agnostic-note">These questions work for any field and any background. There are no right or wrong answers, just pick the one that feels most true.</div>
+      <div class="choice-wrap" id="choices-5"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goBack(5)">← Back</button>
+        <button class="btn-primary" id="btn-5" onclick="goNext(5)" disabled>See my result →</button>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="step" id="step-result">
+      <div class="result-hero">
+        <div class="result-eyebrow" id="r-eyebrow">Your primary layer</div>
+        <div class="result-title" id="r-title"></div>
+        <div class="result-desc" id="r-desc"></div>
+      </div>
+      <div class="insight-box">
+        <div class="insight-label">What this means</div>
+        <div class="insight-text" id="r-insight"></div>
+      </div>
+      <div class="next-box">
+        <div class="next-label">What to focus on next</div>
+        <div class="next-text" id="r-next"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="all-layers" id="r-all-layers">
+        <div class="all-layers-title">Your full picture</div>
+        <div id="all-layers-list"></div>
+      </div>
+      <div class="secondary-section" id="r-secondary" style="display:none">
+        <div class="secondary-title">Other layers worth noting</div>
+        <div id="r-secondary-list"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="accuracy-box">
+        <div class="accuracy-title">Does this feel accurate to you?</div>
+        <div class="accuracy-sub">This is based on 5 questions, so it's a starting point, not the full picture. If something feels off or doesn't match, we'd like to hear it.</div>
+        <a class="accuracy-link" href="mailto:hi@fluxforward.world?subject=Activation Scan feedback">Share your thoughts →</a>
+      </div>
+
+      <div class="guided-entry" id="guided-entry-block">
+        <div class="guided-entry-label">Go deeper</div>
+        <div class="guided-entry-title">Want to go a bit deeper?</div>
+        <div class="guided-entry-sub">Pick the situation that sounds most like yours. You'll get a short explanation and one clear thing to do next.</div>
+        <button class="btn-primary" onclick="startGuidedLayer()">Yes, show me more →</button>
+      </div>
+
+      <!-- GUIDED LAYER -->
+      <div class="guided-layer" id="guided-layer" style="display:none;">
+        <div class="guided-separator"></div>
+        <button class="guided-back" onclick="hideGuidedLayer()">← Back to result</button>
+        <div class="step-label" id="guided-layer-label">Going deeper</div>
+        <div class="guided-question" id="guided-question-text"></div>
+        <div class="guided-choices" id="guided-choices-list"></div>
+        <div class="guided-response" id="guided-response">
+          <div class="guided-interpretation">
+            <div class="guided-interpretation-label">What this usually means</div>
+            <div class="guided-interpretation-text" id="guided-interp-text"></div>
+          </div>
+          <div class="guided-next">
+            <div class="guided-next-label">Your next step</div>
+            <div class="guided-next-text" id="guided-next-text"></div>
+          </div>
+          <div class="guided-support" id="guided-support-block">
+            <div class="guided-support-text" id="guided-support-text"></div>
+            <a class="guided-support-link" href="https://calendly.com/flux-forward/activation-scan-call" target="_blank" rel="noopener">Book a free Activation Scan call →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="email-capture" id="email-capture-block">
+        <div class="email-capture-title">Want to save this?</div>
+        <div class="email-capture-sub">Leave your email and we'll keep a copy. Nothing else unless you ask.</div>
+        <div class="field"><label>First name</label><input type="text" id="fname" placeholder="Your name" oninput="checkEmail()" /></div>
+        <div class="field"><label>Email address</label><input type="email" id="email" placeholder="you@example.com" oninput="checkEmail()" /></div>
+        <div class="consent-row" id="consent-row">
+          <input type="checkbox" id="gdpr-consent" onchange="checkEmail()" />
+          <label for="gdpr-consent">I agree to my data being stored by Flux Forward. <button type="button" class="consent-link" onclick="openGdprModal()">More info</button></label>
+        </div>
+        <div class="field" style="flex-direction:row;align-items:flex-start;gap:10px;display:flex;margin-bottom:1.25rem;">
+          <input type="checkbox" id="newsletter" style="margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:var(--red);cursor:pointer;" />
+          <label for="newsletter" style="font-size:13px;color:var(--text-muted);line-height:1.5;cursor:pointer;text-transform:none;letter-spacing:0;">Keep me updated with insights and resources for internationals in the Netherlands. (optional)</label>
+        </div>
+        <button class="btn-primary" id="btn-save" onclick="saveResult()" disabled style="margin-bottom:0.75rem;"><span>Save my result →</span></button>
+        <div class="email-capture-success" id="save-success">Saved. We'll be in touch if useful.</div>
+        <button class="btn-secondary" onclick="skipSave()" style="font-size:11px;padding:10px;margin-top:0.5rem;">No thanks, skip this</button>
+      </div>
+      <div id="post-save-block" style="display:none;">
+        <button class="btn-inline" onclick="copyResult()">Copy result summary</button>
+      </div>
+      <p class="cta-softener">For most people, one short conversation is enough to find that one clear next step.</p>
+      <div class="cta-title" id="cta-title">Want help making this practical?</div>
+      <div class="cta-sub" id="cta-sub">Book a free 15-minute Activation Scan call. We’ll go through your result together and give you one clear next step.</div>
+      <a class="btn-cta" id="cta-btn" href="https://calendly.com/flux-forward/activation-scan-call" target="_blank" rel="noopener">Book a free 15-minute call →</a>
+      <div class="minor-links">
+        <a class="minor-link" href="https://blog.fluxforward.world/p/youre-not-stuck-youre-misdiagnosed" target="_blank" rel="noopener">Read: You're not stuck. You're misdiagnosed. →</a>
+        <a class="minor-link" href="https://blog.fluxforward.world/p/how-activation-actually-happens" target="_blank" rel="noopener">Read: How activation actually happens. →</a>
+      </div>
+    </div>
+
+    </div>
+  </div>
+</div>
+</main>
+
+<footer>
+  <p><a href="https://fluxforward.world">Flux Forward</a>. Activating and retaining talent for the Dutch economy.</p>
+</footer>
+
+<script>
+  // Each question: array of {text, layer_index, score}
+  // layer_index: 0=Priority, 1=System, 2=Positioning, 3=Execution, 4=Capacity
+  const questions = [
+    {
+      choices: [
+        { text: "Just one, clearly defined", layer: 0, score: 1 },
+        { text: "Two or three, with some overlap", layer: 0, score: 2 },
+        { text: "Four or more, hard to keep track", layer: 0, score: 4 },
+        { text: "I'm not sure. It changes week to week", layer: 0, score: 5 }
+      ]
+    },
+    {
+      choices: [
+        { text: "Mostly through platforms I searched (LinkedIn, job boards)", layer: 1, score: 5 },
+        { text: "A mix of platforms and people I already knew", layer: 1, score: 3 },
+        { text: "Mostly through people who reached out or referred me", layer: 1, score: 1 },
+        { text: "I haven't had many opportunities or conversations recently", layer: 1, score: 4 }
+      ]
+    },
+    {
+      choices: [
+        { text: "I explain it clearly and they get it quickly", layer: 2, score: 1 },
+        { text: "I explain it but often get vague or uncertain reactions", layer: 2, score: 3 },
+        { text: "I struggle to find the right framing for this context", layer: 2, score: 5 },
+        { text: "I tend to give different answers depending on who's asking", layer: 2, score: 4 }
+      ]
+    },
+    {
+      choices: [
+        { text: "Focused on one clear track with consistent actions", layer: 3, score: 1 },
+        { text: "Split across 2–3 things, some progress on each", layer: 3, score: 2 },
+        { text: "Spread across many things, hard to point to clear progress", layer: 3, score: 5 },
+        { text: "Mostly reactive, responding to things as they came up", layer: 3, score: 4 }
+      ]
+    },
+    {
+      choices: [
+        { text: "Nothing much. I usually follow through", layer: 4, score: 1 },
+        { text: "Uncertainty about whether it's the right step", layer: 0, score: 3 },
+        { text: "Low energy or motivation to start", layer: 4, score: 5 },
+        { text: "Too many competing priorities pulling me elsewhere", layer: 3, score: 4 }
+      ]
+    }
+  ];
+
+  const layers = [
+    { name:"Priority Confusion", title:"You have too many options and can't pick one.", desc:"You want to move forward, but you're not sure which direction to go. Maybe you're looking at a job and a side project and a possible move at the same time. When everything feels equally important, nothing actually moves.", insight:"The problem isn't that you're not trying. It's that you haven't made a real choice yet. Until you do, your energy keeps splitting between options instead of going into one.", next:"Pick one thing to focus on for the next 30 days. Not forever, just for now. A real choice, even an imperfect one, will move you forward faster than keeping all options open.", shortDesc:"Too many directions, no real decision yet." },
+    { name:"System Blindness", title:"You don't fully see how things work here yet.", desc:"You're putting in the work: applying, reaching out, showing up. But a lot of what actually moves here happens before anything gets posted online. Referrals, informal conversations, people mentioning your name in the right room.", insight:"It's not that you're not doing enough. It's that part of the market is still invisible to you. The places where things actually happen are not always the most obvious ones.", next:"Before you apply to another job, talk to one person who works in your field here. Ask them how they got in. That one conversation will tell you more than ten more applications.", shortDesc:"Part of how things work here is still invisible to you." },
+    { name:"Positioning Collapse", title:"People don't quickly understand what you bring.", desc:"Your experience is real. But when you explain what you do or what you're looking for, the reaction is often vague or uncertain. It's not that your background is wrong. It's that it's not coming across clearly in this context.", insight:"This is not about your skills. It's about how you explain yourself. If someone can't quickly understand what you do and why it matters, they can't help you, even if they want to.", next:"Pick one thing to explain better: your LinkedIn headline, your introduction, or how you describe your last job. Make it so clear that someone could repeat it to a colleague in one sentence.", shortDesc:"Your background is strong, but it's not coming across clearly here." },
+    { name:"Execution Fragmentation", title:"You're busy, but nothing is really moving forward.", desc:"You're doing things. You're trying. But every week feels like you're starting from zero. You're applying here, reaching out there, exploring something else on the side. A lot of activity, not much momentum.", insight:"The problem is not that you're not working hard enough. It's that your effort is spread too thin. When you do a little of everything, nothing builds on itself.", next:"For the next two weeks, pick one thing only. One type of role, one way of reaching out, one track. Do that one thing consistently. Progress happens when effort stacks up, not when it spreads out.", shortDesc:"Too much going on at once. Nothing is building." },
+    { name:"Capacity Breakdown", title:"You're running low and pushing harder isn't helping.", desc:"You've been at this for a while. The uncertainty, the rejections, the pressure to figure it all out, it adds up. At some point your energy and patience quietly run out. Things that used to feel manageable now feel much harder.", insight:"This isn't a discipline problem. When you've been running on low for too long, more effort usually makes things worse, not better. You need to recover first, then move.", next:"For the next few days, take one thing off your plate. Not forever, just for now. Rest is not wasted time. It's what makes the next step possible.", shortDesc:"You've been pushing for a while and you're running out of fuel." }
+  ];
+
+  // scores per layer
+  const layerScores = [0, 0, 0, 0, 0];
+  const selectedChoices = [null, null, null, null, null];
+  let currentStep = 0;
+  let resultData = null;
+  let secondaryLayers = [];
+
+  // Build choice UIs
+  for (let q = 1; q <= 5; q++) {
+    const wrap = document.getElementById('choices-' + q);
+    questions[q-1].choices.forEach((choice, ci) => {
+      const el = document.createElement('div');
+      el.className = 'choice-option';
+      el.innerHTML = '<div class="choice-dot"><div class="choice-inner"></div></div><div class="choice-text">' + choice.text + '</div>';
+      el.addEventListener('click', () => {
+        wrap.querySelectorAll('.choice-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedChoices[q-1] = ci;
+        document.getElementById('btn-' + q).disabled = false;
+      });
+      wrap.appendChild(el);
+    });
+  }
+
+  function computeScores() {
+    layerScores.fill(0);
+    for (let q = 0; q < 5; q++) {
+      const ci = selectedChoices[q];
+      if (ci === null) continue;
+      const choice = questions[q].choices[ci];
+      layerScores[choice.layer] += choice.score;
+    }
+  }
+
+  function toggleAccordion(id) {
+    const body = document.getElementById(id);
+    const icon = document.getElementById(id + '-icon');
+    if (!body) return;
+    const isOpen = body.style.display !== 'none';
+    body.style.display = isOpen ? 'none' : 'block';
+    if (icon) {
+      icon.textContent = isOpen ? '+' : '-';
+      if (isOpen) icon.classList.remove('open');
+      else icon.classList.add('open');
+    }
+  }
+
+  function makeTooltipName(name, desc) {
+    return '<span class="tooltip-wrap">' + name + '<span class="tooltip-icon">?</span><span class="tooltip-popup">' + desc + '</span></span>';
+  }
+
+  function updateProgress(step) {
+    currentStep = step;
+    const pct = step >= 6 ? 100 : Math.round((step / 6) * 100);
+    document.getElementById('progress').style.width = pct + '%';
+    const labels = ['', 'Question 1 of 5', 'Question 2 of 5', 'Question 3 of 5', 'Question 4 of 5', 'Question 5 of 5', 'Result ready'];
+    document.getElementById('progress-text').textContent = labels[step] || '';
+    document.querySelectorAll('.progress-dot').forEach((dot, index) => {
+      dot.classList.toggle('active', index <= Math.min(step, 5));
+    });
+  }
+
+  function checkEmail() {
+    const name = document.getElementById('fname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const consent = document.getElementById('gdpr-consent').checked;
+    const validEmail = name.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    document.getElementById('btn-save').disabled = !(validEmail && consent);
+    const row = document.getElementById('consent-row');
+    if (row) {
+      if (consent) row.classList.add('checked');
+      else row.classList.remove('checked');
+    }
+  }
+
+  function openGdprModal() {
+    document.getElementById('gdpr-modal').classList.add('visible');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeGdprModal(e) {
+    if (e && e.type === 'click' && e.target.id !== 'gdpr-modal' && e.currentTarget !== e.target) return;
+    document.getElementById('gdpr-modal').classList.remove('visible');
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('gdpr-modal');
+      if (modal && modal.classList.contains('visible')) closeGdprModal();
+    }
+  });
+
+  // ── COOKIE CONSENT ──
+  let storageAllowed = false;
+
+  function checkCookieConsent() {
+    let consent = null;
+    try { consent = localStorage.getItem('ff_storage_consent'); } catch(e) {}
+    if (consent === 'accepted') {
+      storageAllowed = true;
+    } else if (consent === 'rejected') {
+      storageAllowed = false;
+    } else {
+      // No decision yet - show banner
+      setTimeout(() => {
+        const banner = document.getElementById('cookie-banner');
+        if (banner) banner.classList.add('visible');
+      }, 600);
+    }
+  }
+
+  function acceptCookies() {
+    try { localStorage.setItem('ff_storage_consent', 'accepted'); } catch(e) {}
+    storageAllowed = true;
+    document.getElementById('cookie-banner').classList.remove('visible');
+  }
+
+  function rejectCookies() {
+    try {
+      // Clear any existing data
+      localStorage.removeItem('ff_scan_v28_result');
+      localStorage.setItem('ff_storage_consent', 'rejected');
+    } catch(e) {}
+    storageAllowed = false;
+    document.getElementById('cookie-banner').classList.remove('visible');
+  }
+
+  // Initialize on load
+  checkCookieConsent();
+
+  function goNext(from) {
+    document.getElementById('step-' + from).classList.remove('active');
+    if (from === 5) { showResult(); return; }
+    document.getElementById('step-' + (from + 1)).classList.add('active');
+    updateProgress(from + 1);
+    scrollToScan();
+  }
+
+  function goBack(from) {
+    document.getElementById('step-' + from).classList.remove('active');
+    document.getElementById('step-' + (from - 1)).classList.add('active');
+    updateProgress(from - 1);
+    scrollToScan();
+  }
+
+  function scrollToScan() {
+    const card = document.querySelector('.scan-card');
+    if (!card) return;
+    const top = card.getBoundingClientRect().top + window.pageYOffset - 84;
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  }
+
+  function getScoreLabel(score) {
+    if (score === 0) return 'Not present';
+    if (score <= 2) return 'Low';
+    if (score <= 4) return 'Moderate';
+    if (score <= 6) return 'High';
+    return 'Very high';
+  }
+
+  function isLowResult(maxScore) {
+    return maxScore <= 2;
+  }
+
+  function animateResultItems() {
+    const items = document.querySelectorAll('.result-hero, .insight-box, .next-box, .all-layers, .secondary-section, .accuracy-box');
+    items.forEach((el, i) => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(8px)';
+      el.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+      setTimeout(() => {
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      }, 80 + i * 60);
+    });
+  }
+
+  function showResult() {
+    computeScores();
+    const maxScore = Math.max(...layerScores);
+    let primaryIdx = layerScores.indexOf(maxScore);
+    resultData = { idx: primaryIdx, ...layers[primaryIdx] };
+
+    if (isLowResult(maxScore)) {
+      resultData = null;
+      secondaryLayers = [];
+      document.getElementById('r-eyebrow').textContent = 'Your result';
+      document.getElementById('r-title').textContent = 'Things look fairly clear for you right now.';
+      document.getElementById('r-desc').textContent = "Based on what you answered, none of the 5 areas we look at seem to be causing a big problem right now. That's a good sign.";
+      document.getElementById('r-insight').textContent = "Either things are genuinely going well, which is great. Or what's getting in the way for you just didn't come up in these 5 questions. Both are possible.";
+      document.getElementById('r-next').textContent = "If things are going well, the job now is to keep it that way. If something still feels off but didn't show up here, a short conversation usually finds it quickly.";
+      document.getElementById('r-all-layers').style.display = 'none';
+      document.getElementById('r-secondary').style.display = 'none';
+    } else {
+      document.getElementById('r-eyebrow').textContent = 'Your primary layer';
+      document.getElementById('r-all-layers').style.display = 'block';
+      document.getElementById('r-title').textContent = resultData.title;
+      document.getElementById('r-desc').textContent = resultData.desc;
+      document.getElementById('r-insight').textContent = resultData.insight;
+      document.getElementById('r-next').textContent = resultData.next;
+
+      const allLayersList = document.getElementById('all-layers-list');
+      allLayersList.innerHTML = '';
+      const maxPossible = 10;
+      layers.forEach((layer, i) => {
+        const score = layerScores[i];
+        const pct = Math.round((score / maxPossible) * 100);
+        const isPrimary = i === primaryIdx;
+        const row = document.createElement('div');
+        row.className = 'layer-row' + (isPrimary ? ' primary' : '');
+        const tooltipDescs = {
+          'Priority Confusion': 'You have too many options and haven\'t committed to one yet.',
+          'System Blindness': 'Part of how things work here is still invisible to you.',
+          'Positioning Collapse': 'People don\'t quickly understand what you bring.',
+          'Execution Fragmentation': 'Too much going on at once. Nothing is building.',
+          'Capacity Breakdown': 'You\'ve been pushing for a while and you\'re running low.'
+        };
+        row.innerHTML = '<div class="layer-row-name" style="' + (isPrimary ? 'font-weight:700;color:var(--red);' : '') + '">' + makeTooltipName(layer.name, tooltipDescs[layer.name] || '') + (isPrimary ? ' ↑' : '') + '</div><div class="layer-bar-wrap"><div class="layer-bar-fill ' + (score <= 2 ? 'low' : '') + '" style="width:' + Math.min(pct, 100) + '%"></div></div><div class="layer-score-label">' + getScoreLabel(score) + '</div>';
+        allLayersList.appendChild(row);
+      });
+
+      const secondaries = layerScores.map((s, i) => ({ s, i })).filter(x => x.i !== primaryIdx && x.s >= 3);
+      secondaryLayers = secondaries.map(x => layers[x.i]);
+      const secondaryList = document.getElementById('r-secondary-list');
+      secondaryList.innerHTML = '';
+      if (secondaries.length > 0) {
+        secondaries.sort((a, b) => b.s - a.s);
+        secondaries.forEach(x => {
+          const l = layers[x.i];
+          const item = document.createElement('div');
+          item.className = 'secondary-layer';
+          item.innerHTML = '<div class="secondary-layer-name">' + l.name + '</div><div class="secondary-layer-text">' + l.shortDesc + '</div>';
+          secondaryList.appendChild(item);
+        });
+        document.getElementById('r-secondary').style.display = 'block';
+      }
+    }
+
+    document.getElementById('step-result').classList.add('active');
+    updateProgress(6);
+    scrollToScan();
+    animateResultItems();
+
+    // Layer-specific CTA
+    const ctaMessages = {
+      'Priority Confusion': { title: 'Still not sure which direction to go?', sub: "In a free 15-minute call, we can help you make one clear choice and start moving." },
+      'System Blindness': { title: "Not sure how things actually work here?", sub: "In a free 15-minute call, we can show you where opportunities actually move in your field, and what to do differently." },
+      'Positioning Collapse': { title: "People not getting what you do?", sub: "In a free 15-minute call, we can help you explain yourself more clearly so the right people understand what you bring." },
+      'Execution Fragmentation': { title: "Busy but nothing is moving?", sub: "In a free 15-minute call, we can help you pick one thing to focus on and actually make it move." },
+      'Capacity Breakdown': { title: "Running out of energy to keep going?", sub: "In a free 15-minute call, we can help you figure out what to stop doing and how to get moving again." },
+      'low_score': { title: "Want to talk it through?", sub: "If things are going well, great. If something still feels off, a short conversation usually finds it quickly." }
+    };
+    const layerName = resultData ? resultData.name : 'low_score';
+    const ctaMsg = ctaMessages[layerName] || ctaMessages['low_score'];
+    if (document.getElementById('cta-title')) document.getElementById('cta-title').textContent = ctaMsg.title;
+    if (document.getElementById('cta-sub')) document.getElementById('cta-sub').textContent = ctaMsg.sub;
+
+    try {
+      if (storageAllowed) {
+        localStorage.setItem('ff_scan_v28_result', JSON.stringify({ primaryLayer: resultData ? resultData.name : 'low_score', layerScores, savedAt: new Date().toISOString() }));
+      }
+    } catch(e) {}
+  }
+
+  async function saveResult() {
+    const name = document.getElementById('fname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    if (!name || !email) return;
+    try {
+      await fetch('https://formspree.io/f/xaqabvgd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          name, email,
+          source: 'Activation Scan V2.8',
+          newsletter: document.getElementById('newsletter').checked ? 'yes' : 'no',
+          primary_layer: resultData ? resultData.name : 'low_score',
+          primary_title: resultData ? resultData.title : '',
+          primary_next: resultData ? resultData.next : '',
+          secondary_layers: secondaryLayers.map(l => l.name).join(', '),
+          score_priority_confusion: layerScores[0],
+          score_system_blindness: layerScores[1],
+          score_positioning: layerScores[2],
+          score_execution: layerScores[3],
+          score_capacity: layerScores[4]
+        })
+      });
+    } catch(e) { console.log('Formspree error:', e); }
+    document.getElementById('save-success').style.display = 'block';
+    document.getElementById('btn-save').disabled = true;
+    setTimeout(() => {
+      document.getElementById('email-capture-block').style.display = 'none';
+      document.getElementById('post-save-block').style.display = 'block';
+    }, 1500);
+  }
+
+  function skipSave() {
+    document.getElementById('email-capture-block').style.display = 'none';
+    document.getElementById('post-save-block').style.display = 'block';
+  }
+
+  function buildSummary() {
+    if (!resultData) return 'No strong layer identified.';
+    let s = 'Primary layer: ' + resultData.name + '\n\n' + resultData.title + '\n\n' + resultData.desc + '\n\nWhat this means: ' + resultData.insight + '\n\nWhat to focus on next: ' + resultData.next;
+    if (secondaryLayers.length > 0) s += '\n\nOther layers worth noting: ' + secondaryLayers.map(l => l.name).join(', ');
+    return s;
+  }
+
+  async function copyResult() {
+    try {
+      await navigator.clipboard.writeText(buildSummary());
+      alert('Result copied to clipboard.');
+    } catch(e) { alert('Could not copy automatically.'); }
+  }
+
+  // =====================
+  // GUIDED ACTIVATION LAYER DATA
+  // =====================
+  const guidedData = {
+    'Priority Confusion': {
+      question: 'Which of these sounds most like your situation right now?',
+      support: 'If the options still feel equally heavy, a short conversation usually cuts through it fast.',
+      situations: [
+        {
+          text: 'I have too many options and cannot commit to one.',
+          interp: 'The issue is not that your options are bad. It is that without a decision structure, every option stays equally valid forever. The longer you hold all of them open, the more energy leaks across all of them without anything moving forward.',
+          next: 'Write your top three options on paper. For each one, answer one question: "If I committed to this for the next 30 days, what would I do tomorrow?" The option with the clearest answer is probably your starting point.'
+        },
+        {
+          text: 'I know what I want, but I am not sure it is realistic here.',
+          interp: 'This is less about confusion and more about confidence in the local context. You have direction, but you are holding back because you are not sure the market will respond. That uncertainty often leads to hedging, which makes you less visible for the thing you actually want.',
+          next: 'Test it before concluding it is not viable. Apply for one role or reach out to one person in that direction this week. Real signal from the market is more useful than more time spent weighing it in your head.'
+        },
+        {
+          text: 'I keep switching between options depending on how each week goes.',
+          interp: 'When your direction changes with each piece of feedback or rejection, it is usually a sign that you have not committed to a direction yet. You are still testing which one feels safest. The result is that nothing compounds, and each week feels like starting over.',
+          next: 'Pick one direction for the next two weeks and do not change it regardless of what happens. Not because it is definitely right, but because consistency is what creates the data you need to actually evaluate it.'
+        },
+        {
+          text: 'I feel pressure to make the right decision, so I keep delaying.',
+          interp: 'The search for the right decision is often what prevents any decision. In practice, most directions become clearer through movement than through analysis. The cost of staying still is usually higher than the cost of starting in a slightly imperfect direction.',
+          next: 'Give yourself a deadline: by the end of this week, you will commit to one direction for the next month. Not forever. Just long enough to actually see what happens.'
+        },
+        {
+          text: 'I am not sure what I actually want anymore.',
+          interp: 'This sometimes happens after a long period of uncertainty or adaptation. The original goal got blurred by the pressures of the transition itself. What you wanted before you arrived may no longer fit who you have become here, and that gap has not been named yet.',
+          next: 'Set aside the question of what is realistic for a moment. Write down what you would pursue if you knew it would work. That answer often reveals what you actually want, which is a better starting point than what feels safe right now.'
+        }
+      ]
+    },
+    'System Blindness': {
+      question: 'When it comes to finding opportunities here, which of these sounds most like you?',
+      support: 'If the system still feels unclear, a conversation can help map what is actually relevant in your specific field.',
+      situations: [
+        {
+          text: 'I apply regularly but rarely hear back.',
+          interp: 'Low response rates on applications usually point to one of two things: the application itself is not landing clearly, or the channel is not the right one. Most opportunities in the Dutch market move through networks and referrals before they ever appear on a job board. Applying more to the same channels usually does not change the outcome.',
+          next: 'For your next five applications, identify one person at each company before applying. Send a short message first. Not a pitch, just a genuine question about their work. Applications that follow a real conversation get read differently.'
+        },
+        {
+          text: 'I do not really understand how hiring works in my field here.',
+          interp: 'Every field in the Netherlands has its own hiring logic. Some move almost entirely through referrals. Some rely heavily on recruitment agencies. Some have informal communities where most roles are discussed before they are posted. Without knowing the specific pattern in your field, effort tends to go into the most visible channels, which are often the least effective.',
+          next: 'Find two or three people working in your field here and ask them one question: "How did you get your current role?" The answers will tell you more about how the system actually works than any job board.'
+        },
+        {
+          text: 'I am not sure who the right people are to connect with.',
+          interp: 'This usually means the landscape is still unclear. You do not yet have a working map of who matters in your field, which organizations are relevant, or how roles and decisions actually flow. Building that map is not a luxury. It is what makes the rest of your effort more effective.',
+          next: 'Pick one company or organization you are genuinely interested in. Spend 30 minutes mapping who works there in relevant roles. Then identify one person you could reach out to with a specific, genuine reason. One real connection in the right place is worth more than fifty applications.'
+        },
+        {
+          text: 'I know people, but I do not know how to turn connections into opportunities.',
+          interp: 'Having a network and knowing how to activate it are two different things. Most people are willing to help if they understand exactly what you are looking for. The gap is usually in how you ask, not in the relationships themselves.',
+          next: 'Reach out to one person you already know this week. Be specific: tell them exactly what kind of role or conversation you are looking for, and ask if they know anyone worth talking to. Vague requests get vague responses. Specific requests get real ones.'
+        },
+        {
+          text: 'I feel like I am on the outside of something but I cannot quite see what it is.',
+          interp: 'That feeling usually points to the invisible layer of the market. There are communities, conversations, and informal networks where things actually move, and they are not always easy to find from the outside. Being on the outside is not permanent, but it does require deliberate steps to get in.',
+          next: 'Find one community, event, or group in your field in the Netherlands and show up consistently for the next month. Not to pitch yourself, just to become a familiar presence. Familiarity is what opens the invisible layer.'
+        }
+      ]
+    },
+    'Positioning Collapse': {
+      question: 'When you try to explain what you do or what you\'re looking for, which of these sounds most like you?',
+      support: 'If this still feels unclear, a short conversation usually makes it concrete fast.',
+      situations: [
+        {
+          text: 'I know what I have done, but I do not know how to frame it for this market.',
+          interp: 'Your experience is real and solid. The issue is translation, not of language, but of context. What made sense in your previous environment does not automatically carry the same weight here. The market needs a different signal.',
+          next: 'Pick one role or direction you are actually pursuing. Rewrite your LinkedIn headline as if you are speaking directly to someone hiring for that specific role, not summarizing your career. One clear signal lands better than a complete picture.'
+        },
+        {
+          text: 'I get different reactions depending on who I am talking to.',
+          interp: 'Inconsistent reactions usually mean your positioning is not anchored yet. You are adjusting your story based on the audience, which creates noise. When the message changes, the market cannot build a clear picture of you.',
+          next: 'Write one version of your story that you use consistently, regardless of who is asking. It does not need to cover everything. It needs to be clear enough that the other person could explain what you do to someone else.'
+        },
+        {
+          text: 'I feel like I am applying below my level, just to stay in the game.',
+          interp: 'This usually happens when your actual level is not visible in how you present yourself. You are compensating for a translation gap by lowering the target, but that often makes things worse, not better. Employers see a lower-level candidate, not someone adapting.',
+          next: 'Look at your most recent application. Does it reflect what you actually bring, or a safer version of it? One specific rewrite, a cover letter, a LinkedIn summary, one job application, is enough to test whether the gap is in the presentation, not the profile.'
+        },
+        {
+          text: 'I am not sure what kind of role or direction I should be positioning myself for here.',
+          interp: 'This sits at the edge of Positioning Collapse and Priority Confusion. Without a clear direction, positioning becomes impossible. You cannot present yourself clearly if you do not know what you are presenting for. The issue is not how you are seen. It is that you have not yet decided what you want to be seen as.',
+          next: 'Before rewriting anything, pick one direction to test for the next two weeks. Apply as if that is the direction. See what comes back. Positioning clarity often comes from testing, not from thinking it through in isolation.'
+        },
+        {
+          text: 'People seem interested in me, but conversations do not go anywhere.',
+          interp: 'Interest without conversion usually points to a gap between first impression and depth. You are visible enough to get attention, but something in the follow-through does not confirm what the first impression suggested. This can be about how you explain your value in conversation, not just on paper.',
+          next: 'After your next conversation that does not progress, send a short follow-up that makes your direction and value explicit in one or two sentences. Not a pitch, just clarity. "I am specifically looking for X because Y." This removes ambiguity and often unlocks the next step.'
+        }
+      ]
+    },
+    'Execution Fragmentation': {
+      question: 'When it comes to actually moving things forward, which of these sounds most like you?',
+      support: 'If things keep fragmenting, a short conversation can help identify what is actually breaking the loop.',
+      situations: [
+        {
+          text: 'I am doing a lot but nothing seems to compound.',
+          interp: 'When effort does not accumulate, it is usually because each action is isolated. Applying here, networking there, exploring something else over there. Without a repeatable loop connecting those actions, each week starts from zero. The problem is not the volume of effort. It is the structure around it.',
+          next: 'Define one loop for the next two weeks: one target area, one action per day, one metric to track. It does not need to be perfect. It needs to be consistent enough that this week\'s effort builds on last week\'s.'
+        },
+        {
+          text: 'I start things but have trouble following through.',
+          interp: 'Inconsistent follow-through usually points to one of two things: too many tracks running at once, or a mismatch between what you are doing and what you actually want. When direction is unclear, motivation to execute drops. When focus is scattered, completion rate drops. Both look the same from the outside.',
+          next: 'Look at the last three things you started but did not finish. Was the issue energy, direction, or competing priorities? The pattern usually reveals which one to solve first.'
+        },
+        {
+          text: 'I am not sure where to put my energy first.',
+          interp: 'This is Execution Fragmentation meeting Priority Confusion. Without a clear hierarchy, every action feels equally optional. The result is scattered effort that does not move anything forward fast enough to create visible progress.',
+          next: 'Write down everything you are currently working on. Pick the one thing that, if it moved forward this week, would make the most difference. Do that one thing first tomorrow, before anything else. Sequence matters more than volume.'
+        },
+        {
+          text: 'I am reactive, responding to things as they come instead of driving a clear direction.',
+          interp: 'A reactive mode usually develops after a long period of uncertainty. When things feel out of control, responding to what arrives feels safer than committing to a direction that might not work. But reactive effort rarely compounds. It keeps you busy without moving you forward.',
+          next: 'Before checking messages or emails tomorrow morning, write down the one thing you want to have done by the end of the day. Do that first. One proactive action before the reactive mode kicks in is enough to start shifting the pattern.'
+        },
+        {
+          text: 'I make progress for a while, then it falls apart.',
+          interp: 'Progress that cannot sustain itself usually means the system depends too much on motivation rather than structure. Good weeks happen when you feel ready. Bad weeks happen when you do not. The goal is to build a loop that runs even on the bad weeks, because those are the weeks that actually matter.',
+          next: 'Design your minimum viable week. What is the smallest set of actions that, if you did only those, would still count as forward movement? That is your floor. When things get hard, you do not skip the week. You do the floor.'
+        }
+      ]
+    },
+    'Capacity Breakdown': {
+      question: 'When it comes to finding the energy to keep going, which of these sounds most like you?',
+      support: 'If things feel too heavy to move right now, we are happy to think through it together without pressure.',
+      situations: [
+        {
+          text: 'I am exhausted and I do not know how to recover.',
+          interp: 'When exhaustion reaches this point, the usual advice to push harder or try a new strategy usually backfires. The system is already overloaded. More input creates more friction, not more progress. Recovery at this stage is not a break from the work. It is the work.',
+          next: 'For the next three days, remove one thing from your daily list. Not permanently. Just for three days. Notice what happens to your energy. Capacity recovery starts with reduction, not addition.'
+        },
+        {
+          text: 'I know what to do, but I cannot seem to make myself do it.',
+          interp: 'This gap between knowing and doing is often a sign of depleted capacity, not lack of motivation. When the system is overloaded, executive function drops. Starting becomes harder. The tasks feel heavier than they are. This is not a discipline problem. It is a resource problem.',
+          next: 'Make the next step smaller. Not "apply for three jobs today" but "open the job board." Not "write my LinkedIn About section" but "open LinkedIn." Lowering the activation threshold is how you restart movement when capacity is low.'
+        },
+        {
+          text: 'Every setback hits harder than it used to.',
+          interp: 'When rejection or silence lands heavier than it should, it usually means the emotional buffer has been depleted. After months of pressure, the same setback hits differently. That is not weakness. It is a sign the system needs replenishment.',
+          next: 'Identify one thing outside the job search or transition that reliably gives you energy. Not rest, but something that actively restores. Schedule it this week, not as a reward, but as maintenance.'
+        },
+        {
+          text: 'I feel pressure to keep moving even though I am running on empty.',
+          interp: 'The pressure to keep going often comes from outside expectations, visa timelines, or the fear that stopping means falling behind. But continuing at low capacity usually produces lower-quality output and more mistakes. A short deliberate pause usually produces better results than sustained low-quality effort.',
+          next: 'Give yourself permission to slow down for one week. Not stop, but reduce the pace intentionally. Define what "slower but still moving" looks like for you, and do that instead of pushing through.'
+        },
+        {
+          text: 'I am not sure if I am burned out or just stuck.',
+          interp: 'The difference matters. Being stuck usually means the strategy needs adjustment. Being burned out means the system needs recovery first, before any strategy change will help. The clearest signal: if the thought of working on your situation feels heavy even on a good day, that is capacity. If it feels heavy only after a hard week, that is more likely to be strategy.',
+          next: 'Take one full day this week completely away from anything related to your transition. No applications, no LinkedIn, no planning. After that day, notice how it feels to think about it again. If it feels lighter, the issue is pace. If it still feels heavy, the issue is capacity and it needs more deliberate attention.'
+        }
+      ]
+    },
+    'low_score': {
+      question: 'Based on your answers, things look fairly clear. Which of these is closest to what\'s true for you?',
+      support: 'If you are curious what is actually happening, we are happy to take a look together.',
+      situations: [
+        {
+          text: 'Things are genuinely going well right now.',
+          interp: 'Good. The scan is designed to surface friction, and in your case it did not find much. That is useful information in itself.',
+          next: 'The main task now is keeping the momentum. One thing that helps: write down what is working. Not to celebrate, but to make the pattern visible so you can protect it when things get harder.'
+        },
+        {
+          text: 'Something feels off, but I could not find it in the questions.',
+          interp: 'The scan covers 5 layers based on patterns we have seen across many internationals. But it does not cover everything. Sometimes the friction is more specific, more personal, or sits between layers. That is not a failure of the scan. It is just the limit of a short diagnostic.',
+          next: 'A short conversation usually reveals what the scan could not. Bring this result and describe what feels off. That is often enough to find it quickly.'
+        }
+      ]
+    }
+  };
+
+  let guidedLayerName = null;
+  let guidedSelectedIdx = null;
+
+  function startGuidedLayer() {
+    const layerName = resultData ? resultData.name : 'low_score';
+    guidedLayerName = layerName;
+    guidedSelectedIdx = null;
+
+    const data = guidedData[layerName] || guidedData['low_score'];
+
+    document.getElementById('guided-entry-block').style.display = 'none';
+    const guidedLayer = document.getElementById('guided-layer');
+    guidedLayer.style.display = 'block';
+
+    document.getElementById('guided-layer-label').textContent = layerName === 'low_score' ? 'Going deeper' : 'Going deeper: ' + layerName;
+    document.getElementById('guided-question-text').textContent = data.question;
+
+    const choicesList = document.getElementById('guided-choices-list');
+    choicesList.innerHTML = '';
+    data.situations.forEach((sit, idx) => {
+      const el = document.createElement('div');
+      el.className = 'guided-choice';
+      el.innerHTML = '<div class="guided-choice-dot"><div class="guided-choice-dot-inner"></div></div><div class="guided-choice-text">' + sit.text + '</div>';
+      el.addEventListener('click', () => {
+        choicesList.querySelectorAll('.guided-choice').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        guidedSelectedIdx = idx;
+        showGuidedResponse(layerName, idx);
+      });
+      choicesList.appendChild(el);
+    });
+
+    document.getElementById('guided-response').classList.remove('visible');
+    window.scrollTo(0, document.getElementById('guided-layer').offsetTop - 20);
+  }
+
+  function showGuidedResponse(layerName, idx) {
+    const data = guidedData[layerName];
+    const sit = data.situations[idx];
+
+    document.getElementById('guided-interp-text').textContent = sit.interp;
+    document.getElementById('guided-next-text').textContent = sit.next;
+    document.getElementById('guided-support-text').textContent = data.support;
+
+    const response = document.getElementById('guided-response');
+    response.classList.add('visible');
+    setTimeout(() => {
+      response.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+
+  function hideGuidedLayer() {
+    document.getElementById('guided-layer').style.display = 'none';
+    document.getElementById('guided-entry-block').style.display = 'block';
+    window.scrollTo(0, document.getElementById('guided-entry-block').offsetTop - 20);
+  }
+
+
+  updateProgress(0);
+</script>
+
+
+<!-- Cookie Banner -->
+<div class="cookie-banner" id="cookie-banner">
+  <div class="cookie-banner-inner">
+    <div class="cookie-banner-text">
+      <strong>We use local storage to remember your progress.</strong>
+      Nothing is sent to our servers unless you save your result. <button type="button" onclick="openGdprModal()" style="background:none;border:none;color:white;text-decoration:underline;cursor:pointer;font-family:inherit;font-size:inherit;font-weight:600;padding:0;">Read more</button>
+    </div>
+    <div class="cookie-banner-actions">
+      <button class="cookie-btn cookie-btn-reject" onclick="rejectCookies()">Reject</button>
+      <button class="cookie-btn cookie-btn-accept" onclick="acceptCookies()">Accept</button>
+    </div>
+  </div>
+</div>
+
+<!-- GDPR Modal -->
+<div class="modal-overlay" id="gdpr-modal" onclick="closeGdprModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeGdprModal()">×</button>
+    <div class="modal-eyebrow">Privacy &amp; Data</div>
+    <div class="modal-title">How we handle your data</div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">What we store</div>
+      <div class="modal-section-text">Your first name, email address, and your scan result (which layer scored highest, plus all 5 layer scores). That's it. We don't track your behavior, location, or anything else.</div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Why we store it</div>
+      <div class="modal-section-text">So we can send you a copy of your result, and follow up only if it's useful. If you opted in to the newsletter, we may send occasional insights for internationals in NL.</div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Where it's stored</div>
+      <div class="modal-section-text">Securely via <a href="https://formspree.io/legal/privacy-policy/" target="_blank" rel="noopener">Formspree</a>, a GDPR-compliant data processor based in the EU. We never sell or share your data with third parties.</div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">How long we keep it</div>
+      <div class="modal-section-text">As long as it's relevant to our communication with you. You can request deletion at any time and we'll remove it within 7 days.</div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">Your rights</div>
+      <div class="modal-section-text">Under GDPR, you have the right to access, correct, or delete your data at any time. To exercise any of these rights, email <a href="mailto:hi@fluxforward.world">hi@fluxforward.world</a> and we'll respond within 7 days.</div>
+    </div>
+
+    <div class="modal-divider"></div>
+
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="closeGdprModal()"><span>Got it</span></button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
