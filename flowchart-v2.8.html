@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Activation Scan V2.8 — Complete Flowchart</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { padding: 40px; background: #f4f3f0; font-family: 'Inter', 'Arial', sans-serif; color: #111; }
+  h1 { font-size: 22px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  h2 { font-size: 13px; font-weight: 400; color: #999; margin-bottom: 40px; }
+
+  .chart { display: flex; flex-direction: column; align-items: center; max-width: 1000px; margin: 0 auto; }
+  .w100 { width: 100%; max-width: 1000px; }
+
+  .sec { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #aaa; margin-bottom: 10px; align-self: flex-start; width: 100%; }
+  .arr { text-align: center; padding: 7px 0; color: #ccc; font-size: 16px; width: 100%; }
+  .sep { width: 100%; height: 1px; background: #e0ddd6; margin: 24px 0; }
+
+  .badge { display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 8px; margin-left: 6px; vertical-align: middle; border-radius: 100px; }
+  .badge-app { background: #111; color: white; }
+  .badge-unchanged { background: #e0ddd6; color: #555; }
+  .badge-gdpr { background: #fde8e7; color: #E8201A; border: 1px solid #E8201A; }
+
+  .node { padding: 14px 20px; text-align: center; width: 100%; border-radius: 6px; }
+  .node-lbl { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 5px; }
+  .node-title { font-size: 14px; font-weight: 700; line-height: 1.35; }
+  .node-sub { font-size: 12px; color: #777; margin-top: 5px; line-height: 1.5; }
+
+  .n-black { background: #111; max-width: 380px; border-radius: 12px; }
+  .n-black .node-title { color: white; }
+  .n-black .node-lbl { color: #E8201A; }
+  .n-black .node-sub { color: #bbb; }
+
+  .n-app-panel { background: #111; max-width: 700px; border-radius: 18px; }
+  .n-app-panel .node-title { color: white; font-size: 16px; }
+  .n-app-panel .node-lbl { color: #E8201A; }
+  .n-app-panel .node-sub { color: rgba(255,255,255,0.7); }
+
+  .n-card { background: white; border: 1px solid #e0ddd6; max-width: 700px; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+  .n-card .node-lbl { color: #555; }
+
+  .n-red-card { background: white; border: 2px solid #E8201A; max-width: 700px; border-radius: 12px; }
+  .n-red-card .node-lbl { color: #E8201A; }
+
+  .n-decision { background: #fff8f7; border: 2px solid #E8201A; max-width: 380px; border-radius: 12px; }
+  .n-decision .node-lbl { color: #E8201A; }
+
+  .n-result-hero { background: #111; max-width: 700px; border-radius: 18px; padding: 22px 24px; }
+  .n-result-hero .node-title { color: white; font-size: 18px; }
+  .n-result-hero .node-lbl { color: #E8201A; }
+  .n-result-hero .node-sub { color: rgba(255,255,255,0.75); }
+
+  .n-next-action { background: #111; max-width: 700px; border-radius: 14px; padding: 18px 22px; }
+  .n-next-action .node-title { color: white; }
+  .n-next-action .node-lbl { color: #4ade80; }
+  .n-next-action .node-sub { color: rgba(255,255,255,0.75); }
+
+  .n-lowscore { background: #f0f8f3; border: 2px solid #0f6b37; max-width: 700px; border-radius: 12px; }
+  .n-lowscore .node-lbl { color: #0f6b37; }
+
+  .n-cta-pill {
+    background: #E8201A;
+    color: white;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: inline-block;
+  }
+
+  .n-cookie { background: #111; border-radius: 16px; max-width: 720px; }
+  .n-cookie .node-lbl { color: #E8201A; }
+  .n-cookie .node-title { color: white; font-size: 13px; }
+  .n-cookie .node-sub { color: rgba(255,255,255,0.85); }
+
+  .grid5 { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; width: 100%; }
+  .grid3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; width: 100%; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; }
+
+  .card { background: white; border: 1px solid #e0ddd6; padding: 12px; border-radius: 8px; }
+  .card-lbl { font-size: 10px; font-weight: 700; color: #E8201A; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+  .card-title { font-size: 11px; font-weight: 700; color: #111; margin-bottom: 5px; }
+  .card-body { font-size: 10px; color: #777; line-height: 1.55; }
+
+  /* APP SHELL MOCKUP */
+  .app-shell {
+    background: white;
+    border: 1px solid #e0ddd6;
+    border-radius: 16px;
+    padding: 16px;
+    width: 100%;
+    max-width: 1000px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    margin-bottom: 8px;
+  }
+  .app-nav {
+    background: #111;
+    border-radius: 10px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .app-nav-left { display: flex; align-items: center; gap: 10px; }
+  .app-logo {
+    width: 28px;
+    height: 28px;
+    background: white;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    color: #111;
+  }
+  .app-nav-text { color: white; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+  .app-nav-right { display: flex; gap: 14px; align-items: center; }
+  .app-nav-link { color: rgba(255,255,255,0.7); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+  .app-nav-link.primary { color: white; }
+  .app-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 14px;
+  }
+  .app-hero {
+    background: #f4f3f0;
+    padding: 18px;
+    border-radius: 12px;
+  }
+  .app-hero-badge {
+    display: inline-block;
+    background: #fde8e7;
+    color: #E8201A;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .app-hero-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #111;
+    margin-bottom: 8px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .app-hero-sub {
+    font-size: 11px;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+  .app-hero-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 9px;
+    font-weight: 700;
+    color: #999;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .app-card {
+    background: white;
+    border: 1px solid #e0ddd6;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .app-card-header {
+    background: #111;
+    color: white;
+    padding: 12px 16px;
+  }
+  .app-card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .app-kicker { font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
+  .app-time-pill {
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 999px;
+    color: rgba(255,255,255,0.8);
+    font-size: 9px;
+    font-weight: 700;
+    padding: 3px 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .app-progress-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 7px;
+  }
+  .app-progress-fill {
+    width: 14%;
+    height: 100%;
+    background: #E8201A;
+  }
+  .app-progress-text {
+    font-size: 8px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .app-dots {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+  }
+  .app-dot {
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.15);
+  }
+  .app-dot.active { background: #E8201A; }
+  .app-card-body {
+    padding: 14px;
+  }
+  .app-card-body-lbl {
+    font-size: 9px;
+    font-weight: 700;
+    color: #E8201A;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .app-card-body-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+  .app-card-body-text {
+    font-size: 10px;
+    color: #555;
+    line-height: 1.55;
+  }
+
+  /* BIG NEW BANNER */
+  .v28-banner {
+    width: 100%;
+    max-width: 1000px;
+    background: #111;
+    color: white;
+    padding: 18px 24px;
+    border-radius: 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .v28-banner-left { display: flex; align-items: center; gap: 14px; }
+  .v28-banner-icon {
+    width: 38px;
+    height: 38px;
+    background: #E8201A;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+  .v28-banner-title { color: white; font-size: 14px; font-weight: 700; margin-bottom: 3px; letter-spacing: -0.01em; }
+  .v28-banner-sub { color: rgba(255,255,255,0.7); font-size: 11px; line-height: 1.4; }
+
+  .split { display: flex; width: 100%; max-width: 700px; gap: 16px; margin-top: 8px; }
+  .split-col { flex: 1; display: flex; flex-direction: column; align-items: center; }
+  .tag { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 8px; margin-bottom: 6px; border-radius: 100px; }
+  .tag-r { background: #fff5f4; color: #E8201A; border: 1px solid #E8201A; }
+  .tag-g { background: #f0f8f3; color: #0f6b37; border: 1px solid #0f6b37; }
+
+  .mini { background: white; border: 1px solid #e0ddd6; padding: 10px 14px; font-size: 11px; color: #555; margin-bottom: 8px; border-radius: 8px; }
+  .mini strong { color: #111; display: block; font-size: 12px; margin-bottom: 2px; }
+  .mini-red { background: #fff8f7; border-color: #E8201A; }
+  .mini-dark { background: #111; color: rgba(255,255,255,0.85); border-color: #111; border-radius: 10px; }
+  .mini-dark strong { color: white; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; }
+  .leg { display: flex; align-items: center; gap: 7px; font-size: 11px; color: #555; }
+  .leg-box { width: 22px; height: 14px; flex-shrink: 0; border-radius: 4px; }
+
+  .gdpr-flow { background: #fff5f4; border: 1px dashed #E8201A; border-radius: 12px; padding: 18px; width: 100%; max-width: 1000px; }
+  .gdpr-flow-title { font-size: 12px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: #E8201A; margin-bottom: 12px; text-align: center; }
+  .gdpr-step { background: white; border: 1px solid rgba(232,32,26,0.25); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #555; margin-bottom: 8px; }
+  .gdpr-step strong { color: #111; display: block; font-size: 12px; margin-bottom: 4px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<h1>Activation Scan V2.8 — Complete Flowchart</h1>
+<h2>Flux Forward  |  scan.fluxforward.world  |  April 2026</h2>
+
+<div class="chart">
+
+  <!-- V2.8 STRATEGIC BANNER -->
+  <div class="v28-banner">
+    <div class="v28-banner-left">
+      <div class="v28-banner-icon">V2.8</div>
+      <div>
+        <div class="v28-banner-title">App-aligned product shell</div>
+        <div class="v28-banner-sub">All functional content unchanged from V2.7. The scan now mirrors app.fluxforward.world to read as a focused diagnostic module within the larger platform.</div>
+      </div>
+    </div>
+    <div class="n-cta-pill">Module of app.fluxforward.world</div>
+  </div>
+
+  <div class="arr">↓</div>
+
+  <!-- APP SHELL VISUAL MOCKUP -->
+  <div class="sec">New product shell <span class="badge badge-app">V2.8 LAYOUT</span></div>
+  <div class="app-shell">
+    <div class="app-nav">
+      <div class="app-nav-left">
+        <div class="app-logo">FF</div>
+        <div class="app-nav-text">Flux Forward</div>
+      </div>
+      <div class="app-nav-right">
+        <span class="app-nav-link primary">Start Scan</span>
+        <span class="app-nav-link">Back to App</span>
+        <span class="app-nav-link">Framework</span>
+      </div>
+    </div>
+    <div class="app-grid">
+      <div class="app-hero">
+        <span class="app-hero-badge">Free diagnostic</span>
+        <div class="app-hero-title">Activation Scan</div>
+        <div class="app-hero-sub">A short diagnostic for internationals putting in effort but not getting clear results yet.</div>
+        <div class="app-hero-meta">
+          <span>5 questions</span>
+          <span>•</span>
+          <span>5 minutes</span>
+          <span>•</span>
+          <span>No signup</span>
+        </div>
+      </div>
+      <div class="app-card">
+        <div class="app-card-header">
+          <div class="app-card-header-row">
+            <div class="app-kicker">Diagnostic workspace</div>
+            <div class="app-time-pill">5 min</div>
+          </div>
+          <div class="app-progress-bar"><div class="app-progress-fill"></div></div>
+          <div class="app-progress-text">Step 1 of 6</div>
+          <div class="app-dots">
+            <div class="app-dot active"></div>
+            <div class="app-dot"></div>
+            <div class="app-dot"></div>
+            <div class="app-dot"></div>
+            <div class="app-dot"></div>
+            <div class="app-dot"></div>
+          </div>
+        </div>
+        <div class="app-card-body">
+          <div class="app-card-body-lbl">Free diagnostic</div>
+          <div class="app-card-body-title">Are you trying hard but things still aren't moving?</div>
+          <div class="app-card-body-text">Answer 5 quick questions. You'll see which of 5 areas may be getting in the way, and get one clear next step.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:10px;color:#aaa;margin-top:6px;text-align:center;width:100%;">Sidebar with logo + nav links  ·  Two-column layout  ·  Black scan card with header + progress dots  ·  Soft grey background</div>
+
+  <div class="arr">↓</div>
+
+  <!-- COOKIE BANNER -->
+  <div class="sec">Cookie consent banner <span class="badge badge-gdpr">GDPR</span> <span class="badge badge-unchanged">Restyled V2.8</span></div>
+  <div class="node n-cookie">
+    <div class="node-lbl">Bottom of screen, slides up after 600ms</div>
+    <div class="node-title">"We use local storage to remember your progress."</div>
+    <div class="node-sub">Restyled to match app system: rounded corners, app typography. Functional behaviour unchanged.</div>
+    <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;">
+      <span style="background:transparent;border:1px solid rgba(255,255,255,0.4);color:white;padding:5px 14px;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;border-radius:999px;">Reject</span>
+      <span class="n-cta-pill" style="font-size:10px;padding:5px 14px;">Accept</span>
+    </div>
+  </div>
+  <div class="arr">↓</div>
+
+  <!-- ENTRY -->
+  <div class="sec">Entry to scan</div>
+  <div class="node n-black"><div class="node-title">User visits scan.fluxforward.world</div></div>
+  <div class="arr">↓</div>
+
+  <!-- PREVIEW -->
+  <div class="sec">Step 0: Preview screen <span class="badge badge-app">Module-style V2.8</span></div>
+  <div class="node n-card">
+    <div class="node-lbl">Diagnostic workspace · 5 min</div>
+    <div class="node-title">"Are you trying hard but things still aren't moving?"</div>
+    <div class="node-sub">
+      Headline: "Activation Scan"<br>
+      Tagline: "A short diagnostic for internationals putting in effort but not getting clear results yet."<br>
+      <strong style="color:#111;">Preview cards:</strong> 5 friction layers · 1 primary signal · 0 account required<br>
+      CTA pill: "Start the scan, no signup needed"
+    </div>
+  </div>
+  <div class="arr">↓</div>
+
+  <!-- QUESTIONS -->
+  <div class="sec">Steps 1–5: Behavioral questions <span class="badge badge-unchanged">Unchanged from V2.7</span></div>
+  <div class="grid5 w100">
+    <div class="card">
+      <div class="card-lbl">Q1</div>
+      <div class="card-title">Priority Confusion</div>
+      <div class="card-body">"How many directions have you been pursuing?"</div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Q2</div>
+      <div class="card-title">System Blindness</div>
+      <div class="card-body">"How did your last 5 opportunities come about?"</div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Q3</div>
+      <div class="card-title">Positioning Collapse</div>
+      <div class="card-body">"When someone asks what you do, what happens?"</div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Q4</div>
+      <div class="card-title">Execution Fragmentation</div>
+      <div class="card-body">"How did you spend last week's energy?"</div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Q5</div>
+      <div class="card-title">Capacity / Mixed</div>
+      <div class="card-body">"What gets in the way of your next step?"</div>
+    </div>
+  </div>
+  <div style="font-size:10px;color:#aaa;margin-top:6px;text-align:center;width:100%;">Answer cards restyled as app cards (rounded, white, soft border)  ·  Field-agnostic note on every question</div>
+  <div class="arr">↓</div>
+
+  <!-- SCORING -->
+  <div class="node n-card" style="max-width:520px;">
+    <div class="node-lbl">Scoring engine</div>
+    <div class="node-title">Compute cumulative score per layer (0–10)</div>
+    <div class="node-sub">Primary = highest. Secondary = score 3+. Low score = max 2 or below. <em>Logic unchanged from V2.7.</em></div>
+  </div>
+  <div class="arr">↓</div>
+
+  <!-- DECISION -->
+  <div class="node n-decision">
+    <div class="node-lbl">Decision</div>
+    <div class="node-title">Is max score 2 or below?</div>
+  </div>
+
+  <div class="split">
+    <div class="split-col">
+      <div class="arr" style="color:#0f6b37;">↓</div>
+      <div class="tag tag-g">Yes — low score</div>
+      <div class="node n-lowscore" style="max-width:none;">
+        <div class="node-lbl">Low-score result</div>
+        <div class="node-title">"Things look fairly clear for you right now."</div>
+      </div>
+    </div>
+    <div class="split-col">
+      <div class="arr" style="color:#E8201A;">↓</div>
+      <div class="tag tag-r">No — standard</div>
+      <div class="node n-result-hero" style="max-width:none;">
+        <div class="node-lbl">Result hero — black app panel <span class="badge badge-app" style="margin-left:0;background:#E8201A;">RESTYLED</span></div>
+        <div class="node-title">Primary layer identified</div>
+      </div>
+    </div>
+  </div>
+  <div class="arr">↓</div>
+
+  <!-- 5 RESULTS -->
+  <div class="sec">The 5 possible standard results</div>
+  <div class="grid5 w100">
+    <div class="card">
+      <div class="card-title">Priority Confusion</div>
+      <div class="card-body">"You have too many options and can't pick one."</div>
+    </div>
+    <div class="card">
+      <div class="card-title">System Blindness</div>
+      <div class="card-body">"You don't fully see how things work here yet."</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Positioning Collapse</div>
+      <div class="card-body">"People don't quickly understand what you bring."</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Execution Fragmentation</div>
+      <div class="card-body">"You're busy, but nothing is really moving forward."</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Capacity Breakdown</div>
+      <div class="card-body">"You're running low and pushing harder isn't helping."</div>
+    </div>
+  </div>
+  <div class="arr">↓</div>
+
+  <!-- NEXT STEP BLACK PANEL -->
+  <div class="node n-next-action">
+    <div class="node-lbl">Next step — black action panel <span class="badge badge-app" style="margin-left:0;background:#4ade80;color:#111;">RESTYLED V2.8</span></div>
+    <div class="node-title">One specific action to take</div>
+    <div class="node-sub">Restyled from green-bordered box to a full black action panel matching app's action surfaces.</div>
+  </div>
+  <div class="arr">↓</div>
+
+  <!-- ACCURACY + GUIDED -->
+  <div class="node n-card" style="max-width:540px;">
+    <div class="node-lbl">Accuracy check</div>
+    <div class="node-title">"Does this feel accurate to you?"</div>
+    <div class="node-sub">Mailto to hi@fluxforward.world</div>
+  </div>
+  <div class="arr">↓</div>
+
+  <div class="node n-app-panel">
+    <div class="node-lbl">Guided Activation Layer</div>
+    <div class="node-title">"Want to go a bit deeper?"</div>
+    <div class="node-sub">Pick the situation that sounds most like yours. Get one short explanation and one clear next step.<br><em>Layer functional content unchanged. App panel styling applied.</em></div>
+  </div>
+  <div class="arr">↓</div>
+
+  <!-- GUIDED SITUATIONS -->
+  <div class="sec">Situation question per primary layer <span class="badge badge-unchanged">Content unchanged</span></div>
+  <div class="grid3 w100">
+    <div class="card">
+      <div class="card-lbl">Priority Confusion</div>
+      <div class="card-title">"Which sounds most like your situation?"</div>
+      <div class="card-body">5 situations · click-based · short explanation + next step</div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">System Blindness</div>
+      <div class="card-title">"When finding opportunities..."</div>
+      <div class="card-body">5 situations · click-based · short explanation + next step</div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Positioning Collapse</div>
+      <div class="card-title">"When explaining what you do..."</div>
+      <div class="card-body">5 situations · click-based · short explanation + next step</div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Execution Fragmentation</div>
+      <div class="card-title">"When moving things forward..."</div>
+      <div class="card-body">5 situations · click-based · short explanation + next step</div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Capacity Breakdown</div>
+      <div class="card-title">"When finding the energy..."</div>
+      <div class="card-body">5 situations · click-based · short explanation + next step</div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Low score</div>
+      <div class="card-title">"Which is closest to what's true?"</div>
+      <div class="card-body">2 situations · click-based · short explanation + next step</div>
+    </div>
+  </div>
+  <div class="arr">↓</div>
+
+  <!-- EMAIL CAPTURE WITH GDPR -->
+  <div class="sep"></div>
+  <div class="sec">Email capture with GDPR consent <span class="badge badge-gdpr">GDPR</span> <span class="badge badge-unchanged">Restyled V2.8</span></div>
+
+  <div class="gdpr-flow">
+    <div class="gdpr-flow-title">★ GDPR Consent Flow (logic unchanged, restyled to app system) ★</div>
+
+    <div class="gdpr-step">
+      <strong>1. Email capture form</strong>
+      "Want to save this?" — First name + Email address (app-style input fields)
+    </div>
+
+    <div class="gdpr-step" style="border-color:#E8201A;background:#fff5f4;">
+      <strong>2. Required GDPR consent checkbox</strong>
+      ☐ I agree to my data being stored by Flux Forward.  <em>More info opens app-styled modal</em><br>
+      <span style="color:#E8201A;font-weight:700;font-size:11px;">Save button stays disabled until checked.</span>
+    </div>
+
+    <div class="gdpr-step">
+      <strong>3. Optional newsletter checkbox</strong>
+      ☐ Keep me updated with insights for internationals in NL. (optional, unchecked by default)
+    </div>
+
+    <div class="gdpr-step">
+      <strong>4. Save button (red pill CTA)</strong>
+      Activated only when: email valid + name filled + consent checked
+    </div>
+  </div>
+
+  <div class="arr">↓</div>
+
+  <!-- CTA -->
+  <div class="sec">Conversion section</div>
+  <div class="grid2 w100">
+    <div>
+      <div class="mini mini-red">
+        <strong>CTA softener (kept from V2.5)</strong>
+        "For most people, one short conversation is enough to find that one clear next step."
+      </div>
+      <div class="node n-next-action" style="max-width:none;padding:14px 18px;">
+        <div class="node-title">Layer-specific CTA</div>
+        <div class="node-sub">Tailored headline per primary layer  ·  Restyled as black action panel</div>
+        <div style="margin-top:10px;"><span class="n-cta-pill" style="font-size:10px;">Book a free 15-minute call</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="mini">
+        <strong>Article links</strong>
+        → "You are not stuck. You are misdiagnosed."<br>
+        → "How activation actually happens."
+      </div>
+      <div class="mini mini-dark">
+        <strong>App-style treatment</strong>
+        Red pill CTAs · Black action panels · Soft grey background · 26px corner radius for primary cards · Inter typeface alongside Barlow.
+      </div>
+    </div>
+  </div>
+  <div class="arr">↓</div>
+
+  <!-- END -->
+  <div class="node n-black"><div class="node-title">User exits or books a call</div></div>
+
+  <div style="height:32px;"></div>
+  <div class="sep"></div>
+
+  <!-- WHAT'S NEW IN V2.8 -->
+  <div class="sec">Summary: What's new in V2.8</div>
+  <div class="grid2 w100">
+    <div>
+      <div class="mini mini-dark">
+        <strong>★ App-aligned product shell</strong>
+        Full app-style sidebar · logo.png added · Start Scan, Back to App, Framework links · Hero reframed as product module · Two-column layout
+      </div>
+      <div class="mini mini-dark">
+        <strong>★ App visual tokens</strong>
+        Soft grey background · Black panels · White cards · Red pill CTAs · 26px radius · Inter typeface added alongside Barlow
+      </div>
+      <div class="mini mini-dark">
+        <strong>★ Component restyling</strong>
+        Scan card → dashboard module · Progress bar + dots restyled · Answer cards as app cards · Result hero as black panel · Next step as black action panel
+      </div>
+    </div>
+    <div>
+      <div class="mini">
+        <strong>Functional content (unchanged)</strong>
+        Diagnostic questions · Scoring · Results · Guided layer · GDPR flow logic · CTA softener · Layer-specific CTAs
+      </div>
+      <div class="mini">
+        <strong>Strategic context</strong>
+        V2.8 is the visual bridge between scan.fluxforward.world and the broader app.fluxforward.world platform vision.
+      </div>
+      <div class="mini">
+        <strong>Technical changes</strong>
+        logo.png added to scan project · Formspree source: "Activation Scan V2.8" · localStorage key: ff_scan_v28_result
+      </div>
+    </div>
+  </div>
+
+  <div style="height:32px;"></div>
+  <div class="sep"></div>
+
+  <!-- LEGEND -->
+  <div class="sec">Legend</div>
+  <div class="legend w100">
+    <div class="leg"><div class="leg-box" style="background:#111;"></div>App panels (black, 26px radius)</div>
+    <div class="leg"><div class="leg-box" style="background:white;border:1px solid #e0ddd6;"></div>App cards (white, rounded)</div>
+    <div class="leg"><div class="leg-box" style="background:#fff5f4;border:2px solid #E8201A;"></div>Decision / GDPR step</div>
+    <div class="leg"><div class="leg-box" style="background:#f0f8f3;border:2px solid #0f6b37;"></div>Low-score result</div>
+    <div class="leg"><div class="leg-box" style="background:#E8201A;border-radius:999px;"></div>Red pill CTA</div>
+    <div class="leg"><div style="background:#111;color:white;font-size:9px;font-weight:800;padding:1px 7px;letter-spacing:0.1em;border-radius:100px;">V2.8 LAYOUT</div>App-aligned change</div>
+    <div class="leg"><div style="background:#e0ddd6;color:#555;font-size:9px;font-weight:800;padding:1px 7px;letter-spacing:0.1em;border-radius:100px;">UNCHANGED</div>Functional content from V2.7</div>
+    <div class="leg"><div style="background:#fde8e7;color:#E8201A;border:1px solid #E8201A;font-size:9px;font-weight:800;padding:1px 7px;letter-spacing:0.1em;border-radius:100px;">GDPR</div>Compliance feature</div>
+  </div>
+
+  <div style="height:40px;"></div>
+  <div style="font-size:11px;color:#aaa;text-align:center;width:100%;">Flux Forward: Activating and retaining talent for the Dutch economy  |  www.FluxForward.World</div>
+  <div style="height:40px;"></div>
+
+</div>
+</body>
+</html>
